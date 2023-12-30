@@ -9,13 +9,14 @@ from pydantic_xml import BaseXmlModel, element
 
 import polars as pl
 
-NSMAP = {'': "http://tempuri.org/SolutionDataset.xsd"}
+NSMAP = {"": "http://tempuri.org/SolutionDataset.xsd"}
 
 
 class UnitTable(BaseXmlModel, tag="t_unit", nsmap=NSMAP):
     """
     Class to represent the table: t_unit
     """
+
     unit_id: int = element()
     value: str = element()
     lang_id: int = element()
@@ -25,6 +26,7 @@ class BandTable(BaseXmlModel, tag="t_band", nsmap=NSMAP):
     """
     Class to represent the table: t_band
     """
+
     band_id: int = element()
 
 
@@ -32,6 +34,7 @@ class CategoryTable(BaseXmlModel, tag="t_category", nsmap=NSMAP):
     """
     Class to represent the table: t_category
     """
+
     category_id: int = element()
     class_id: int = element()
     rank: int = element()
@@ -42,6 +45,7 @@ class ClassTable(BaseXmlModel, tag="t_class", nsmap=NSMAP):
     """
     Class to represent the table: t_class
     """
+
     class_id: int = element()
     name: str = element()
     class_group_id: int = element()
@@ -53,38 +57,43 @@ class ClassGroupTable(BaseXmlModel, tag="t_class_group", nsmap=NSMAP):
     """
     Class to represent the table: t_class_group
     """
+
     class_group_id: int = element()
     name: str = element()
     lang_id: int = element()
 
 
-class CollectionTable(BaseXmlModel, tag="t_collection", nsmap=NSMAP):
+class CollectionTable(BaseXmlModel, tag="t_collection", nsmap=NSMAP, skip_empty=True):
     """
     Class to represent the table: t_collection
     """
+
     collection_id: int = element()
     parent_class_id: int = element()
     child_class_id: int = element()
     name: str = element()
-    complement_name: Optional[str] = element()
+    complement_name: Optional[str] = element(default=None)
     lang_id: int = element()
 
 
-class ConfigTable(BaseXmlModel, tag="t_config", nsmap=NSMAP):
+class ConfigTable(BaseXmlModel, tag="t_config", nsmap=NSMAP, skip_empty=True):
     """
     Class to represent the table: t_config
     """
-    element_: str = element(tag="element")
-    value: str | None = element()
+
+    element_: str = element(tag="element",default=None)
+    value: str = element(default=None)
 
 
 class KeyTable(BaseXmlModel, tag="t_key", nsmap=NSMAP):
     """
     Class to represent the table: t_key
+    attribute model_id is set to id_model for conflicts on pydantic
     """
+
     key_id: int = element()
     membership_id: int = element()
-    model_id: int = element()
+    id_model: int = element(tag="model_id")
     phase_id: int = element()
     property_id: int = element()
     period_type_id: int = element()
@@ -97,6 +106,7 @@ class MembershipTable(BaseXmlModel, tag="t_membership", nsmap=NSMAP):
     """
     Class to represent the table: t_membership
     """
+
     membership_id: int = element()
     parent_class_id: int = element()
     child_class_id: int = element()
@@ -108,8 +118,10 @@ class MembershipTable(BaseXmlModel, tag="t_membership", nsmap=NSMAP):
 class ModelTable(BaseXmlModel, tag="t_model", nsmap=NSMAP):
     """
     Class to represent the table: t_model
+    attribute model_id is set to id_model for conflicts on pydantic
     """
-    model_id: int = element()
+
+    id_model: int = element(tag="model_id")
     name: str = element()
 
 
@@ -117,6 +129,7 @@ class ObjectTable(BaseXmlModel, tag="t_object", nsmap=NSMAP):
     """
     Class to represent the table: t_object
     """
+
     class_id: int = element()
     name: str = element()
     category_id: int = element()
@@ -130,6 +143,7 @@ class Period0Table(BaseXmlModel, tag="t_period_0", nsmap=NSMAP):
     """
     Class to represent the table: t_period_0
     """
+
     interval_id: int = element()
     hour_id: int = element()
     day_id: int = element()
@@ -145,6 +159,7 @@ class Phase3Table(BaseXmlModel, tag="t_phase_3", nsmap=NSMAP):
     """
     Class to represent the table: t_pahse_3
     """
+
     interval_id: int = element()
     period_id: int = element()
 
@@ -153,6 +168,7 @@ class SampleTable(BaseXmlModel, tag="t_sample", nsmap=NSMAP):
     """
     Class to represent the table: t_sample
     """
+
     sample_id: int = element()
     sample_name: str = element()
 
@@ -161,6 +177,7 @@ class TimesliceTable(BaseXmlModel, tag="t_timeslice", nsmap=NSMAP):
     """
     Class to represent the table: t_timeslice
     """
+
     timeslice_id: int = element()
     name: str = element()
 
@@ -169,6 +186,7 @@ class KeyIndexTable(BaseXmlModel, tag="t_key_index", nsmap=NSMAP):
     """
     Class to represent the table: t_ley_index
     """
+
     key_id: int = element()
     period_type_id: int = element()
     position: int = element()
@@ -180,6 +198,7 @@ class PropertyTable(BaseXmlModel, tag="t_property", nsmap=NSMAP):
     """
     Class to represent the table: t_property
     """
+
     property_id: int = element()
     collection_id: int = element()
     enum_id: int = element()
@@ -197,27 +216,30 @@ class AttributeDataTable(BaseXmlModel, tag="t_attribute_data", nsmap=NSMAP):
     """
     Class to represent the table: t_attribute_data
     """
+
     object_id: int = element()
     attribute_id: int = element()
     value: float = element()
 
 
-class AttributeTable(BaseXmlModel, tag="t_attribute", nsmap=NSMAP):
+class AttributeTable(BaseXmlModel, tag="t_attribute", nsmap=NSMAP, skip_empty=True):
     """
     Class to represent the table: t_attribute
     """
+
     attribute_id: int = element()
     class_id: int = element()
     enum_id: int = element()
     name: str = element()
     description: str = element()
-    lang_id: int | None = element()
+    lang_id: int = element(default=None)
 
 
 class SampleWeightTable(BaseXmlModel, tag="t_sample_weight", nsmap=NSMAP):
     """
     Class to represent the table: t_sample_weight
     """
+
     sample_id: int = element()
     phase_id: int = element()
     value: int = element()
@@ -226,9 +248,10 @@ class SampleWeightTable(BaseXmlModel, tag="t_sample_weight", nsmap=NSMAP):
 class ModelPRG(BaseXmlModel, tag="SolutionDataset", nsmap=NSMAP):
     """
     Class to represent a complete solution of plexos .xml file.
-    
+
     This class only work for a PCP solution.
     """
+
     t_unit: list[UnitTable]
     t_band: list[BandTable]
     t_category: list[CategoryTable]
@@ -253,10 +276,10 @@ class ModelPRG(BaseXmlModel, tag="SolutionDataset", nsmap=NSMAP):
     def to_parquet(self, path_to_dir: str) -> None:
         """
         Converts the Plexos Model to parquet tables.
-        
+
         Args:
             path_to_dir (str): path to save the tables.
-        
+
         Returns:
             None
         """
@@ -264,7 +287,7 @@ class ModelPRG(BaseXmlModel, tag="SolutionDataset", nsmap=NSMAP):
         if not path.exists():
             raise ValueError(f"Path: {path_to_dir} does not exist.")
 
-        for table_name, table_data in self.dict().items():
+        for table_name, table_data in self.model_dump().items():
             file = path / table_name
             pl.from_dicts(table_data).write_parquet(file.with_suffix(".parquet"))
 
@@ -276,7 +299,8 @@ class ModelPRG(BaseXmlModel, tag="SolutionDataset", nsmap=NSMAP):
         Returns:
             pl.DataFrame: Tabla "t_key_index".
         """
-        return pl.from_dicts(self.dict(include={"t_key_index"})["t_key_index"])
+        return pl.from_dicts(self.model_dump(include={"t_key_index"})["t_key_index"])
+
 
 def main() -> None:
     """Función para poder usar el código de manera independiente.
@@ -288,14 +312,15 @@ def main() -> None:
     print("Script para extraer modelo de plexos")
     path_to_xml = input("Enter path to xml:\n")
     path = Path(path_to_xml)
-    print("") # espacio para saltar linea XD
+    print("")  # espacio para saltar linea XD
     if not path.exists():
         raise ValueError("No existe el path.")
-    xml_file = path.read_text(encoding='utf-8')
+    xml_file = path.read_text(encoding="utf-8")
     solution = ModelPRG.from_xml(xml_file)
     path_to_folder = input("Enter path to save model:\n")
     solution.to_parquet(path_to_folder)
     print("Listo!")
+
 
 if __name__ == "__main__":
     main()

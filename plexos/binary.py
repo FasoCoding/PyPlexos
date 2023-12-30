@@ -6,6 +6,7 @@ from struct import unpack
 
 import polars as pl
 
+
 def process_binary_data(t_key_index: pl.DataFrame, binary_data: bytes) -> pl.DataFrame:
     """
     Process binary data with the t_key_index table. If the t_key_index table is filtered,
@@ -27,10 +28,10 @@ def process_binary_data(t_key_index: pl.DataFrame, binary_data: bytes) -> pl.Dat
     values = []
 
     for position, length, key_id in zip(positions, lengths, keys):
-        binary_value = binary_data[position: position + length*8]
+        binary_value = binary_data[position : position + length * 8]
         values.extend(read_double_values(binary_value))
-        period_ids.extend(range(1,length+1))
-        key_ids.extend([key_id]*length)
+        period_ids.extend(range(1, length + 1))
+        key_ids.extend([key_id] * length)
 
     key_index_df = pl.DataFrame(
         {
@@ -38,14 +39,11 @@ def process_binary_data(t_key_index: pl.DataFrame, binary_data: bytes) -> pl.Dat
             "period_id": period_ids,
             "value": values,
         },
-        schema={
-            "key_id": pl.Int64,
-            "period_id": pl.Int64,
-            "value": pl.Float64
-        }
+        schema={"key_id": pl.Int64, "period_id": pl.Int64, "value": pl.Float64},
     )
 
     return key_index_df
+
 
 def read_double_values(binary_data: bytes) -> list[float]:
     """
