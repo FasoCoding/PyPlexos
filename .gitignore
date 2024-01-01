@@ -1,5 +1,6 @@
 /.DS_Store
 /.venv
-/poetry.lock
+#/poetry.lock
 /data
 /plexos_reader.ipynb
+/*/__pycache__
