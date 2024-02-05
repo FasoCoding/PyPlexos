@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyplexos"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["faso <bastidas.felipe@gmail.com>"]
 license = "MIT"
@@ -13,11 +13,12 @@ duckdb = "^0.9.2"
 pydantic = "^2.5.3"
 pydantic-xml = "^2.7.0"
 numpy = "^1.26.2"
+lxml = "^5.1.0"
+pyarrow = "^15.0.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.9"
 mypy = "^1.8.0"
-jupyter = "^1.0.0"
 
 [tool.mypy]
 plugins = [

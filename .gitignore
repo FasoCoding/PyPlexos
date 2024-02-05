@@ -2,5 +2,5 @@
 /.venv
 #/poetry.lock
 /data
-/plexos_reader.ipynb
+*.ipynb
 /*/__pycache__

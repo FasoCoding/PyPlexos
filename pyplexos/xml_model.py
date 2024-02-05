@@ -2,12 +2,8 @@
 **plexos_model.py**
 Recopilation of classes to interpret a plexos xml solution.
 """
-
-from pathlib import Path
 from typing import Optional
 from pydantic_xml import BaseXmlModel, element
-
-import polars as pl
 
 NSMAP = {"": "http://tempuri.org/SolutionDataset.xsd"}
 
@@ -81,8 +77,8 @@ class ConfigTable(BaseXmlModel, tag="t_config", nsmap=NSMAP, skip_empty=True):
     Class to represent the table: t_config
     """
 
-    element_: str = element(tag="element",default=None)
-    value: str = element(default=None)
+    element_: str = element(tag="element", serialization_alias="element")
+    value: Optional[str] = element(default=None)
 
 
 class KeyTable(BaseXmlModel, tag="t_key", nsmap=NSMAP):
@@ -93,7 +89,7 @@ class KeyTable(BaseXmlModel, tag="t_key", nsmap=NSMAP):
 
     key_id: int = element()
     membership_id: int = element()
-    id_model: int = element(tag="model_id")
+    id_model: int = element(tag="model_id", serialization_alias="model_id")
     phase_id: int = element()
     property_id: int = element()
     period_type_id: int = element()
@@ -121,7 +117,7 @@ class ModelTable(BaseXmlModel, tag="t_model", nsmap=NSMAP):
     attribute model_id is set to id_model for conflicts on pydantic
     """
 
-    id_model: int = element(tag="model_id")
+    id_model: int = element(tag="model_id", serialization_alias="model_id")
     name: str = element()
 
 
@@ -135,8 +131,8 @@ class ObjectTable(BaseXmlModel, tag="t_object", nsmap=NSMAP):
     category_id: int = element()
     index: int = element()
     object_id: int = element()
-    # show: bool = element() No es necesario, pero existe.
-    # GUID: Optional[str] = element() No es necesario, pero existe.
+    show: bool = element()
+    guid: Optional[str] = element(tag="GUID", serialization_alias="GUID", default=None)
 
 
 class Period0Table(BaseXmlModel, tag="t_period_0", nsmap=NSMAP):
@@ -232,7 +228,7 @@ class AttributeTable(BaseXmlModel, tag="t_attribute", nsmap=NSMAP, skip_empty=Tr
     enum_id: int = element()
     name: str = element()
     description: str = element()
-    lang_id: int = element(default=None)
+    lang_id: Optional[int] = element(default=None)
 
 
 class SampleWeightTable(BaseXmlModel, tag="t_sample_weight", nsmap=NSMAP):
@@ -245,7 +241,131 @@ class SampleWeightTable(BaseXmlModel, tag="t_sample_weight", nsmap=NSMAP):
     value: int = element()
 
 
-class ModelPRG(BaseXmlModel, tag="SolutionDataset", nsmap=NSMAP):
+class CustomCoumnTable(
+    BaseXmlModel, tag="t_custom_column", nsmap=NSMAP, skip_empty=True
+):
+    """
+    Class to represent the table: t_custom_column
+    """
+
+    column_id: int = element(default=None)
+    class_id: int = element(default=None)
+    name: str = element(default=None)
+    position: int = element(default=None)
+    guid: int = element(default=None)
+
+
+class MemoObjectTable(BaseXmlModel, tag="t_memo_object", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_memo_object
+    """
+
+    object_id: int = element(default=None)
+    column_id: int = element(default=None)
+    value: str = element(default=None)
+
+
+class ObjectMetaTable(BaseXmlModel, tag="t_object_meta", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_object_meta
+    """
+
+    object_id: int = element(default=None)
+    class_name: str = element(tag="class", serialization_alias="class", default=None)
+    property_name: str = element(
+        tag="property", serialization_alias="property", default=None
+    )
+    value: str = element(default=None)
+    state: str = element(default=None)
+
+
+class Period1Table(BaseXmlModel, tag="t_period_1", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_period_1
+    """
+
+    day_id: int = element(default=None)
+    date: str = element(default=None)
+    week_id: int = element(default=None)
+    month_id: int = element(default=None)
+    quarter_id: int = element(default=None)
+    fiscal_year_id: int = element(default=None)
+
+
+class Period2Table(BaseXmlModel, tag="t_period_2", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_period_2
+    """
+
+    week_id: int = element(default=None)
+    week_ending: str = element(default=None)
+
+
+class Period3Table(BaseXmlModel, tag="t_period_3", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_period_3
+    """
+
+    month_id: int = element(default=None)
+    month_beginning: str = element(default=None)
+
+
+class Period4Table(BaseXmlModel, tag="t_period_4", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_period_4
+    """
+
+    fiscal_year_id: int = element(default=None)
+    year_ending: str = element(default=None)
+
+
+class Period6Table(BaseXmlModel, tag="t_period_6", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_period_6
+    """
+
+    hour_id: int = element(default=None)
+    day_id: int = element(default=None)
+    datetime: str = element(default=None)
+
+
+class Period7Table(BaseXmlModel, tag="t_period_7", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_period_7
+    """
+
+    quarter_id: int = element(default=None)
+    quarter_beginning: str = element(default=None)
+
+
+class Phase1Table(BaseXmlModel, tag="t_phase_1", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_phase_1
+    """
+
+    interval_id: int = element(default=None)
+    period_id: int = element(default=None)
+
+
+class Phase2Table(BaseXmlModel, tag="t_phase_2", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_phase_2
+    """
+
+    interval_id: int = element(default=None)
+    period_id: int = element(default=None)
+
+
+class Phase4Table(BaseXmlModel, tag="t_phase_4", nsmap=NSMAP, skip_empty=True):
+    """
+    Class to represent the table: t_phase_4
+    """
+
+    interval_id: int = element(default=None)
+    period_id: int = element(default=None)
+
+
+class SolutionModel(BaseXmlModel, tag="SolutionDataset", nsmap=NSMAP):
     """
     Class to represent a complete solution of plexos .xml file.
 
@@ -272,55 +392,15 @@ class ModelPRG(BaseXmlModel, tag="SolutionDataset", nsmap=NSMAP):
     t_attribute_data: list[AttributeDataTable]
     t_attribute: list[AttributeTable]
     t_sample_weight: list[SampleWeightTable]
-
-    def to_parquet(self, path_to_dir: str) -> None:
-        """
-        Converts the Plexos Model to parquet tables.
-
-        Args:
-            path_to_dir (str): path to save the tables.
-
-        Returns:
-            None
-        """
-        path = Path(path_to_dir)
-        if not path.exists():
-            raise ValueError(f"Path: {path_to_dir} does not exist.")
-
-        for table_name, table_data in self.model_dump().items():
-            file = path / table_name
-            pl.from_dicts(table_data).write_parquet(file.with_suffix(".parquet"))
-
-    @property
-    def key_index_tables(self) -> pl.DataFrame:
-        """retorna un dataframe con la tabla "t_key_index". Utilizada para
-        decodificar los datos binarios de la salida plexos.
-
-        Returns:
-            pl.DataFrame: Tabla "t_key_index".
-        """
-        return pl.from_dicts(self.model_dump(include={"t_key_index"})["t_key_index"])
-
-
-def main() -> None:
-    """Función para poder usar el código de manera independiente.
-
-    Raises:
-        ValueError: Si no existe la ruta del archivo.
-    """
-
-    print("Script para extraer modelo de plexos")
-    path_to_xml = input("Enter path to xml:\n")
-    path = Path(path_to_xml)
-    print("")  # espacio para saltar linea XD
-    if not path.exists():
-        raise ValueError("No existe el path.")
-    xml_file = path.read_text(encoding="utf-8")
-    solution = ModelPRG.from_xml(xml_file)
-    path_to_folder = input("Enter path to save model:\n")
-    solution.to_parquet(path_to_folder)
-    print("Listo!")
-
-
-if __name__ == "__main__":
-    main()
+    t_custom_column: Optional[list[CustomCoumnTable]] = None
+    t_memo_object: Optional[list[MemoObjectTable]] = None
+    t_object_meta: Optional[list[ObjectMetaTable]] = None
+    t_period_1: Optional[list[Period1Table]] = None
+    t_period_2: Optional[list[Period2Table]] = None
+    t_period_3: Optional[list[Period3Table]] = None
+    t_period_4: Optional[list[Period4Table]] = None
+    t_period_6: Optional[list[Period6Table]] = None
+    t_period_7: Optional[list[Period7Table]] = None
+    t_phase_1: Optional[list[Phase1Table]] = None
+    t_phase_2: Optional[list[Phase2Table]] = None
+    t_phase_4: Optional[list[Phase4Table]] = None
