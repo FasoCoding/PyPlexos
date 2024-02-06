@@ -384,7 +384,16 @@ class SolutionModel(BaseXmlModel, tag="SolutionDataset", nsmap=NSMAP):
     t_model: list[ModelTable]
     t_object: list[ObjectTable]
     t_period_0: list[Period0Table]
-    t_phase_3: list[Phase3Table]
+    t_period_1: Optional[list[Period1Table]] = None
+    t_period_2: Optional[list[Period2Table]] = None
+    t_period_3: Optional[list[Period3Table]] = None
+    t_period_4: Optional[list[Period4Table]] = None
+    t_period_6: Optional[list[Period6Table]] = None
+    t_period_7: Optional[list[Period7Table]] = None
+    t_phase_1: Optional[list[Phase1Table]] = None
+    t_phase_2: Optional[list[Phase2Table]] = None
+    t_phase_3: Optional[list[Phase3Table]] = None
+    t_phase_4: Optional[list[Phase4Table]] = None
     t_sample: list[SampleTable]
     t_timeslice: list[TimesliceTable]
     t_key_index: list[KeyIndexTable]
@@ -395,12 +404,3 @@ class SolutionModel(BaseXmlModel, tag="SolutionDataset", nsmap=NSMAP):
     t_custom_column: Optional[list[CustomCoumnTable]] = None
     t_memo_object: Optional[list[MemoObjectTable]] = None
     t_object_meta: Optional[list[ObjectMetaTable]] = None
-    t_period_1: Optional[list[Period1Table]] = None
-    t_period_2: Optional[list[Period2Table]] = None
-    t_period_3: Optional[list[Period3Table]] = None
-    t_period_4: Optional[list[Period4Table]] = None
-    t_period_6: Optional[list[Period6Table]] = None
-    t_period_7: Optional[list[Period7Table]] = None
-    t_phase_1: Optional[list[Phase1Table]] = None
-    t_phase_2: Optional[list[Phase2Table]] = None
-    t_phase_4: Optional[list[Phase4Table]] = None

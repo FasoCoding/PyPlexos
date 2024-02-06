@@ -1,0 +1,25 @@
+with dim_centrales as (
+    select  t_membership.membership_id, t_object.name
+    from t_membership
+    inner join t_object ON t_object.object_id = t_membership.child_object_id
+    where t_membership.collection_id == 1
+),
+
+dim_fecha as (
+    select t_phase_3.period_id, t_period_0.datetime
+    from t_phase_3
+    inner join t_period_0 on t_period_0.interval_id = t_phase_3.interval_id
+),
+
+fct_data as (
+    select t_key.membership_id, t_property.name, t_data_0.period_id, t_data_0.value
+    from t_data_0
+    inner join t_key on t_key.key_id = t_data_0.key_id
+    inner join t_property on t_property.property_id = t_key.property_id
+    where t_property.property_id == 1
+)
+
+select fct_data.value, fct_data.name as property, dim_centrales.name as central, dim_fecha.datetime as fecha
+from fct_data
+inner join dim_centrales on dim_centrales.membership_id = fct_data.membership_id
+inner join dim_fecha on dim_fecha.period_id = fct_data.period_id
