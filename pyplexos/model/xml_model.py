@@ -2,8 +2,11 @@
 **plexos_model.py**
 Recopilation of classes to interpret a plexos xml solution.
 """
+import datetime as dt
 from typing import Optional
 from pydantic_xml import BaseXmlModel, element
+from pydantic import field_validator
+
 
 NSMAP = {"": "http://tempuri.org/SolutionDataset.xsd"}
 
@@ -147,8 +150,13 @@ class Period0Table(BaseXmlModel, tag="t_period_0", nsmap=NSMAP):
     month_id: int = element()
     quarter_id: int = element()
     fiscal_year_id: int = element()
-    datetime: str = element()
+    datetime: dt.datetime = element()
     period_of_day: int = element()
+
+    @field_validator("datetime", mode="before")
+    @classmethod
+    def decode_datetime(cls, value: str) -> dt.datetime:
+        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S")
 
 
 class Phase3Table(BaseXmlModel, tag="t_phase_3", nsmap=NSMAP):
@@ -285,11 +293,16 @@ class Period1Table(BaseXmlModel, tag="t_period_1", nsmap=NSMAP, skip_empty=True)
     """
 
     day_id: int = element(default=None)
-    date: str = element(default=None)
+    date: dt.date = element(default=None)
     week_id: int = element(default=None)
     month_id: int = element(default=None)
     quarter_id: int = element(default=None)
     fiscal_year_id: int = element(default=None)
+
+    @field_validator("date", mode="before")
+    @classmethod
+    def decode_datetime(cls, value: str) -> dt.date:
+        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S").date()
 
 
 class Period2Table(BaseXmlModel, tag="t_period_2", nsmap=NSMAP, skip_empty=True):
@@ -298,7 +311,12 @@ class Period2Table(BaseXmlModel, tag="t_period_2", nsmap=NSMAP, skip_empty=True)
     """
 
     week_id: int = element(default=None)
-    week_ending: str = element(default=None)
+    week_ending: dt.date = element(default=None)
+
+    @field_validator("week_ending", mode="before")
+    @classmethod
+    def decode_datetime(cls, value: str) -> dt.date:
+        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S").date()
 
 
 class Period3Table(BaseXmlModel, tag="t_period_3", nsmap=NSMAP, skip_empty=True):
@@ -307,7 +325,12 @@ class Period3Table(BaseXmlModel, tag="t_period_3", nsmap=NSMAP, skip_empty=True)
     """
 
     month_id: int = element(default=None)
-    month_beginning: str = element(default=None)
+    month_beginning: dt.date = element(default=None)
+
+    @field_validator("month_beginning", mode="before")
+    @classmethod
+    def decode_datetime(cls, value: str) -> dt.date:
+        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S").date()
 
 
 class Period4Table(BaseXmlModel, tag="t_period_4", nsmap=NSMAP, skip_empty=True):
@@ -316,7 +339,12 @@ class Period4Table(BaseXmlModel, tag="t_period_4", nsmap=NSMAP, skip_empty=True)
     """
 
     fiscal_year_id: int = element(default=None)
-    year_ending: str = element(default=None)
+    year_ending: dt.date = element(default=None)
+
+    @field_validator("year_ending", mode="before")
+    @classmethod
+    def decode_datetime(cls, value: str) -> dt.date:
+        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S").date()
 
 
 class Period6Table(BaseXmlModel, tag="t_period_6", nsmap=NSMAP, skip_empty=True):
@@ -326,7 +354,12 @@ class Period6Table(BaseXmlModel, tag="t_period_6", nsmap=NSMAP, skip_empty=True)
 
     hour_id: int = element(default=None)
     day_id: int = element(default=None)
-    datetime: str = element(default=None)
+    datetime: dt.datetime = element(default=None)
+
+    @field_validator("datetime", mode="before")
+    @classmethod
+    def decode_datetime(cls, value: str) -> dt.datetime:
+        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S")
 
 
 class Period7Table(BaseXmlModel, tag="t_period_7", nsmap=NSMAP, skip_empty=True):
@@ -335,7 +368,12 @@ class Period7Table(BaseXmlModel, tag="t_period_7", nsmap=NSMAP, skip_empty=True)
     """
 
     quarter_id: int = element(default=None)
-    quarter_beginning: str = element(default=None)
+    quarter_beginning: dt.date = element(default=None)
+
+    @field_validator("quarter_beginning", mode="before")
+    @classmethod
+    def decode_datetime(cls, value: str) -> dt.date:
+        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S").date()
 
 
 class Phase1Table(BaseXmlModel, tag="t_phase_1", nsmap=NSMAP, skip_empty=True):
