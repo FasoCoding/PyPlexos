@@ -50,7 +50,7 @@ class SolutionData(BaseModel):
             binary_value = binary_data[data.position : data.position + data.length * 8]
             values.extend(read_double_values(binary_value))
             period_ids.extend(
-                range(1 + data.period_offset, data.length + 1 + data.period_offset)
+                range(1 + data.period_offset, 1 + data.length + data.period_offset)
             )
             key_ids.extend([data.key_id] * data.length)
 
