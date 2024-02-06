@@ -123,7 +123,11 @@ class PlexosZipReader:
             raise ValueError(f"Path: {path_to_dir} does not exists.")
         print(f"Escribiendo duck en {path}")
 
-        path_duck = path / "pcp.db"
+        path_duck = path / "pcp_v2.db"
+
+        if path_duck.exists():
+            path_duck.unlink()
+
         conn = duck.connect(str(path_duck))
         conn.sql("CREATE SCHEMA IF NOT EXISTS bronze")
 
@@ -149,11 +153,138 @@ class PlexosZipReader:
         conn.sql("CREATE SCHEMA IF NOT EXISTS silver")
         conn.sql(
             """
-            CREATE VIEW silver.t_data_0 AS
-            select  t_membership.membership_id, t_object.name
-            from t_membership
-            inner join t_object ON t_object.object_id = t_membership.child_object_id
+            CREATE TABLE silver.dim_centrales AS
+            select  t_membership.membership_id as id_central, t_object.name as central
+            from bronze.t_membership
+            inner join bronze.t_object ON t_object.object_id = t_membership.child_object_id
             where t_membership.collection_id == 1
             """
         )
+        conn.sql(
+            """
+            CREATE TABLE silver.dim_fechas AS
+            select t_phase_3.period_id as id_fecha, t_period_0.datetime as fecha
+            from bronze.t_phase_3
+            inner join bronze.t_period_0 on t_period_0.interval_id = t_phase_3.interval_id
+            """
+        )
+        conn.sql(
+            """
+            CREATE TABLE silver.fct_generacion AS
+            select t_key.membership_id as id_central, t_data_0.period_id as id_fecha, t_data_0.value as generacion
+            from bronze.t_data_0
+            inner join bronze.t_key on t_key.key_id = t_data_0.key_id
+            inner join bronze.t_property on t_property.property_id = t_key.property_id
+            where t_property.property_id == 1
+            """
+        )
+        conn.sql(
+            """
+            CREATE TABLE silver.fct_perfil AS
+            select t_key.membership_id as id_central, t_data_0.period_id as id_fecha, t_data_0.value as perfil
+            from bronze.t_data_0
+            inner join bronze.t_key on t_key.key_id = t_data_0.key_id
+            inner join bronze.t_property on t_property.property_id = t_key.property_id
+            where t_property.property_id == 219
+            """
+        )
+        conn.sql(
+            """
+            CREATE TABLE silver.fct_curtailment AS
+            select t_key.membership_id as id_central, t_data_0.period_id as id_fecha, t_data_0.value as curtailment
+            from bronze.t_data_0
+            inner join bronze.t_key on t_key.key_id = t_data_0.key_id
+            inner join bronze.t_property on t_property.property_id = t_key.property_id
+            where t_property.property_id == 28
+            """
+        )
+
+        # inicia creacion de capa gold
+        conn.sql("CREATE SCHEMA IF NOT EXISTS gold")
+        conn.sql(
+            """
+            CREATE VIEW gold.gen_data_dia1 AS
+            select dim_centrales.central, dim_fechas.fecha, fct_generacion.generacion
+            from silver.dim_fechas
+            inner join silver.fct_generacion on silver.fct_generacion.id_fecha = silver.dim_fechas.id_fecha
+            inner join silver.fct_curtailment on silver.fct_curtailment.id_fecha = silver.dim_fechas.id_fecha
+            inner join silver.dim_centrales on silver.dim_centrales.id_central = silver.fct_generacion.id_central
+            """
+        )
+
         conn.close()
+
+    def duck_silver_schema(self, conn: duck.DuckDBPyConnection) -> None:
+        """
+        Add siler layer to duckdb dataset.
+
+        Args:
+            path_to_dir (str): path to directory to save parquets.
+
+        Returns:
+            None.
+        """
+        
+        # inicia creacion de capa silver
+        conn.sql("CREATE SCHEMA IF NOT EXISTS silver")
+        conn.sql("""
+            CREATE TABLE silver.dim_centrales (
+                id_central INTEGER PRIMARY KEY,
+                central STRING
+            )
+            """
+        )
+        conn.sql("""
+            CREATE TABLE silver.dim_fechas (
+                id_fecha INTEGER PRIMARY KEY,
+                fecha STRING
+            )
+            """
+        )
+        conn.sql(
+            """
+            CREATE TABLE silver.dim_centrales AS
+            select  t_membership.membership_id as id_central, t_object.name as central
+            from bronze.t_membership
+            inner join bronze.t_object ON t_object.object_id = t_membership.child_object_id
+            where t_membership.collection_id == 1
+            """
+        )
+        conn.sql(
+            """
+            CREATE TABLE silver.dim_fechas AS
+            select t_phase_3.period_id as id_fecha, t_period_0.datetime as fecha
+            from bronze.t_phase_3
+            inner join bronze.t_period_0 on t_period_0.interval_id = t_phase_3.interval_id
+            """
+        )
+        conn.sql(
+            """
+            CREATE TABLE silver.fct_generacion AS
+            select t_key.membership_id as id_central, t_data_0.period_id as id_fecha, t_data_0.value as generacion
+            from bronze.t_data_0
+            inner join bronze.t_key on t_key.key_id = t_data_0.key_id
+            inner join bronze.t_property on t_property.property_id = t_key.property_id
+            where t_property.property_id == 1
+            """
+        )
+        conn.sql(
+            """
+            CREATE TABLE silver.fct_perfil AS
+            select t_key.membership_id as id_central, t_data_0.period_id as id_fecha, t_data_0.value as perfil
+            from bronze.t_data_0
+            inner join bronze.t_key on t_key.key_id = t_data_0.key_id
+            inner join bronze.t_property on t_property.property_id = t_key.property_id
+            where t_property.property_id == 219
+            """
+        )
+        conn.sql(
+            """
+            CREATE TABLE silver.fct_curtailment AS
+            select t_key.membership_id as id_central, t_data_0.period_id as id_fecha, t_data_0.value as curtailment
+            from bronze.t_data_0
+            inner join bronze.t_key on t_key.key_id = t_data_0.key_id
+            inner join bronze.t_property on t_property.property_id = t_key.property_id
+            where t_property.property_id == 28
+            """
+        )
