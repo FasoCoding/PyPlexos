@@ -302,7 +302,7 @@ class Period1Table(BaseXmlModel, tag="t_period_1", nsmap=NSMAP, skip_empty=True)
     @field_validator("date", mode="before")
     @classmethod
     def decode_datetime(cls, value: str) -> dt.date:
-        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S").date()
+        return dt.datetime.strptime(value, r"%Y-%m-%dT%H:%M:%S").date()
 
 
 class Period2Table(BaseXmlModel, tag="t_period_2", nsmap=NSMAP, skip_empty=True):
@@ -316,7 +316,7 @@ class Period2Table(BaseXmlModel, tag="t_period_2", nsmap=NSMAP, skip_empty=True)
     @field_validator("week_ending", mode="before")
     @classmethod
     def decode_datetime(cls, value: str) -> dt.date:
-        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S").date()
+        return dt.datetime.strptime(value, r"%Y-%m-%dT%H:%M:%S").date()
 
 
 class Period3Table(BaseXmlModel, tag="t_period_3", nsmap=NSMAP, skip_empty=True):
@@ -330,7 +330,7 @@ class Period3Table(BaseXmlModel, tag="t_period_3", nsmap=NSMAP, skip_empty=True)
     @field_validator("month_beginning", mode="before")
     @classmethod
     def decode_datetime(cls, value: str) -> dt.date:
-        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S").date()
+        return dt.datetime.strptime(value, r"%Y-%m-%dT%H:%M:%S").date()
 
 
 class Period4Table(BaseXmlModel, tag="t_period_4", nsmap=NSMAP, skip_empty=True):
@@ -344,7 +344,7 @@ class Period4Table(BaseXmlModel, tag="t_period_4", nsmap=NSMAP, skip_empty=True)
     @field_validator("year_ending", mode="before")
     @classmethod
     def decode_datetime(cls, value: str) -> dt.date:
-        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S").date()
+        return dt.datetime.strptime(value, r"%Y-%m-%dT%H:%M:%S").date()
 
 
 class Period6Table(BaseXmlModel, tag="t_period_6", nsmap=NSMAP, skip_empty=True):
@@ -359,7 +359,7 @@ class Period6Table(BaseXmlModel, tag="t_period_6", nsmap=NSMAP, skip_empty=True)
     @field_validator("datetime", mode="before")
     @classmethod
     def decode_datetime(cls, value: str) -> dt.datetime:
-        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S")
+        return dt.datetime.strptime(value, r"%Y-%m-%dT%H:%M:%S")
 
 
 class Period7Table(BaseXmlModel, tag="t_period_7", nsmap=NSMAP, skip_empty=True):
@@ -373,7 +373,7 @@ class Period7Table(BaseXmlModel, tag="t_period_7", nsmap=NSMAP, skip_empty=True)
     @field_validator("quarter_beginning", mode="before")
     @classmethod
     def decode_datetime(cls, value: str) -> dt.date:
-        return dt.datetime.strptime(value, r"%d/%m/%Y %H:%M:%S").date()
+        return dt.datetime.strptime(value, r"%Y-%m-%dT%H:%M:%S").date()
 
 
 class Phase1Table(BaseXmlModel, tag="t_phase_1", nsmap=NSMAP, skip_empty=True):
