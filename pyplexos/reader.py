@@ -9,10 +9,11 @@ from typing import Self
 from dataclasses import dataclass
 
 import polars as pl
-import duckdb as duck
+#import duckdb as duck
 
 from pyplexos.model.xml_model import SolutionModel
 from pyplexos.model.bin_model import SolutionData
+from pyplexos.model.duck_model import duck_model
 
 
 @dataclass
@@ -107,7 +108,7 @@ class PlexosZipReader:
             file = path / table_name
             pl.from_dict(table_data).write_parquet(file.with_suffix(".parquet"))
 
-    def to_duck(self, path_to_dir: str) -> None:
+    def to_duck(self, path_to_dir: str, name_db: str | None = None) -> None:
         """
         Transform a plexos zip solution to duckdb, given a path.
 
@@ -122,21 +123,26 @@ class PlexosZipReader:
         if not path.exists():
             raise ValueError(f"Path: {path_to_dir} does not exists.")
         print(f"Escribiendo duck en {path}")
-
-        path_duck = path / "pcp_v2.db"
+        
+        if name_db is None:
+            name_db = self.solution_model.t_period_0[0].datetime.date().strftime("%Y%m%d")
+            name_db += ".db"
+        
+        path_duck = path / name_db
 
         if path_duck.exists():
             path_duck.unlink()
-
-        conn = duck.connect(str(path_duck))
-        conn.sql("CREATE SCHEMA IF NOT EXISTS bronze")
+        
+        duck = duck_model.create_medallion_duck(path_duck)
+        duck.duck_bronze_schema()
+        duck.duck_silver_schema()
 
         for table_name, table_data in self.solution_model.model_dump(
             by_alias=True
         ).items():
             if table_data is None:
                 continue
-            conn.from_arrow(pl.from_dicts(table_data).to_arrow()).to_table(
+            duck.conn.from_arrow(pl.from_dicts(table_data).to_arrow()).insert_into(
                 f"bronze.{table_name}"
             )
 
@@ -145,85 +151,8 @@ class PlexosZipReader:
         ).items():
             if table_data is None:
                 continue
-            conn.from_arrow(pl.from_dict(table_data).to_arrow()).to_table(
+            duck.conn.from_arrow(pl.from_dict(table_data).to_arrow()).insert_into(
                 f"bronze.{table_name}"
             )
 
-        # acaba va la función de silver. TODO: hacerla
-
-        conn.close()
-
-    def duck_silver_schema(self, conn: duck.DuckDBPyConnection) -> None:
-        """
-        Add siler layer to duckdb dataset.
-
-        Args:
-            path_to_dir (str): path to directory to save parquets.
-
-        Returns:
-            None.
-        """
-        
-        # inicia creacion de capa silver
-        conn.sql("CREATE SCHEMA IF NOT EXISTS silver")
-        conn.sql("""
-            CREATE TABLE silver.dim_centrales (
-                id_central INTEGER PRIMARY KEY,
-                central STRING
-            )
-            """
-        )
-        conn.sql("""
-            CREATE TABLE silver.dim_fechas (
-                id_fecha INTEGER PRIMARY KEY,
-                fecha STRING
-            )
-            """
-        )
-        conn.sql(
-            """
-            CREATE TABLE silver.dim_centrales AS
-            select  t_membership.membership_id as id_central, t_object.name as central
-            from bronze.t_membership
-            inner join bronze.t_object ON t_object.object_id = t_membership.child_object_id
-            where t_membership.collection_id == 1
-            """
-        )
-        conn.sql(
-            """
-            CREATE TABLE silver.dim_fechas AS
-            select t_phase_3.period_id as id_fecha, t_period_0.datetime as fecha
-            from bronze.t_phase_3
-            inner join bronze.t_period_0 on t_period_0.interval_id = t_phase_3.interval_id
-            """
-        )
-        conn.sql(
-            """
-            CREATE TABLE silver.fct_generacion AS
-            select t_key.membership_id as id_central, t_data_0.period_id as id_fecha, t_data_0.value as generacion
-            from bronze.t_data_0
-            inner join bronze.t_key on t_key.key_id = t_data_0.key_id
-            inner join bronze.t_property on t_property.property_id = t_key.property_id
-            where t_property.property_id == 1
-            """
-        )
-        conn.sql(
-            """
-            CREATE TABLE silver.fct_perfil AS
-            select t_key.membership_id as id_central, t_data_0.period_id as id_fecha, t_data_0.value as perfil
-            from bronze.t_data_0
-            inner join bronze.t_key on t_key.key_id = t_data_0.key_id
-            inner join bronze.t_property on t_property.property_id = t_key.property_id
-            where t_property.property_id == 219
-            """
-        )
-        conn.sql(
-            """
-            CREATE TABLE silver.fct_curtailment AS
-            select t_key.membership_id as id_central, t_data_0.period_id as id_fecha, t_data_0.value as curtailment
-            from bronze.t_data_0
-            inner join bronze.t_key on t_key.key_id = t_data_0.key_id
-            inner join bronze.t_property on t_property.property_id = t_key.property_id
-            where t_property.property_id == 28
-            """
-        )
+        duck.conn.close()
