@@ -30,7 +30,7 @@ class DuckWriter:
         return cls(duck.connect(path.as_posix()))
 
     def create_schema(self) -> None:
-        sql = sql_resources.files("pyplexos.writer.schema.sql")
+        sql = sql_resources.files("pyplexos.writer.model.sql")
         bronze_schema = (sql / "bronze.sql").read_text()
         siler_schema = (sql / "silver.sql").read_text()
 
