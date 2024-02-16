@@ -4,8 +4,8 @@ from typing import Self
 from dataclasses import dataclass
 from datetime import datetime
 
-from pyplexos.reader.zip_model.xml_model import SolutionModel
-from pyplexos.reader.zip_model.bin_model import SolutionData
+from pyplexos.reader.zip.xml_model import SolutionModel
+from pyplexos.reader.zip.bin_model import SolutionData
 
 
 @dataclass
