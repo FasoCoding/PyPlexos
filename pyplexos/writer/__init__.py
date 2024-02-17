@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Self
 
-from pyplexos.writer.model.duck_writer import DuckWriter
-from pyplexos.writer.model.parquet_writer import ParquetWriter
-from pyplexos.Protocols import PlexosReaderProtocol, WriterModelProtocol
+from pyplexos.writer.duckdb.duck_writer import DuckWriter
+from pyplexos.writer.parquet.parquet_writer import ParquetWriter
+from pyplexos.protocols import PlexosReaderProtocol, WriterModelProtocol
 
 
 @dataclass
@@ -12,24 +12,17 @@ class PlexosWriter:
 
     @classmethod
     def duck_writer(
-        cls,
-        path_to_dir: str,
-        db_name: str = "pcp.ddb",
-        mode: str = "replace"
+        cls, path_to_dir: str, db_name: str = "pcp.ddb", mode: str = "replace"
     ) -> Self:
         return cls(
             writer_model=DuckWriter.create_medallion_duck(
-                path_to_db=path_to_dir,
-                db_name=db_name,
-                mode=mode
+                path_to_db=path_to_dir, db_name=db_name, mode=mode
             )
         )
 
     @classmethod
     def parquet_writer(cls, path_to_dir: str) -> Self:
-        return cls(
-            writer_model=ParquetWriter.parquet_writer(path_to_dir)
-        )
+        return cls(writer_model=ParquetWriter.parquet_writer(path_to_dir))
 
     def write(self, solution: PlexosReaderProtocol) -> None:
         self.writer_model.write(solution)

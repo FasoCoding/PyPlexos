@@ -17,7 +17,7 @@ class ParquetWriter:
         if not temp_path.exists():
             raise ValueError(f"Path: {path_to_dir} does not exists.")
         return cls(path_to_dir=temp_path)
-    
+
     def write(self, solution: PlexosReaderProtocol) -> None:
         for table_name, table_data in solution.get_solution_model.items():
             if table_data is None:

@@ -3,7 +3,7 @@ import importlib.resources as sql_resources
 from pathlib import Path
 from dataclasses import dataclass
 
-from pyplexos.Protocols import PlexosReaderProtocol
+from pyplexos.protocols import PlexosReaderProtocol
 
 import duckdb as duck
 import polars as pl
@@ -14,7 +14,9 @@ class DuckWriter:
     conn: duck.DuckDBPyConnection
 
     @classmethod
-    def create_medallion_duck(cls, path_to_db: Path, db_name: str, mode: str = "replace") -> duck.DuckDBPyConnection:
+    def create_medallion_duck(
+        cls, path_to_db: Path, db_name: str, mode: str = "replace"
+    ) -> duck.DuckDBPyConnection:
         """Create a duckdb connection from plexos solution.
 
         Returns:
@@ -36,21 +38,20 @@ class DuckWriter:
 
         self.conn.sql(bronze_schema)
         self.conn.sql(siler_schema)
-        
 
     def write(self, solution: PlexosReaderProtocol) -> None:
         self.create_schema()
         for table_name, table_data in solution.get_solution_model.items():
             if table_data is None:
                 continue
-            self.conn.from_arrow(
-                pl.from_dicts(table_data).to_arrow()
-            ).insert_into(f"bronze.{table_name}")
+            self.conn.from_arrow(pl.from_dicts(table_data).to_arrow()).insert_into(
+                f"bronze.{table_name}"
+            )
 
         for table_name, table_data in solution.get_solution_data.items():
             if table_data is None:
                 continue
-            self.conn.from_arrow(
-                pl.from_dict(table_data).to_arrow()
-            ).insert_into(f"bronze.{table_name}")
+            self.conn.from_arrow(pl.from_dict(table_data).to_arrow()).insert_into(
+                f"bronze.{table_name}"
+            )
         self.conn.close()
