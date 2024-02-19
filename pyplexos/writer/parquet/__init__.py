@@ -2,7 +2,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import Self
 
-from pyplexos.Protocols import PlexosReaderProtocol
+from pyplexos.protocols import PlexosReaderProtocol
 
 import polars as pl
 

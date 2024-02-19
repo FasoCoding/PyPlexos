@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Self
 
-from pyplexos.writer.duckdb.duck_writer import DuckWriter
-from pyplexos.writer.parquet.parquet_writer import ParquetWriter
+from pyplexos.writer.duckdb import DuckWriter
+from pyplexos.writer.parquet import ParquetWriter
 from pyplexos.protocols import PlexosReaderProtocol, WriterModelProtocol
 
 

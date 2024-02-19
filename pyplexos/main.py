@@ -1,4 +1,4 @@
-from pyplexos.reader import PlexosZipReader
+from pyplexos.reader import PlexosReader
 from pyplexos.writer import PlexosWriter
 
 import time
@@ -6,7 +6,7 @@ import time
 if __name__ == "__main__":
     print("Probando app")
     start = time.time()
-    reader = PlexosZipReader.from_zip("data\Model PRGdia_Full_Definitivo Solution.zip")
+    reader = PlexosReader.zip_reader("data\Model PRGdia_Full_Definitivo Solution.zip")
     # reader = PlexosZipReader.from_zip("data\Model Test15d Solution.zip")
     end = time.time()
     print(

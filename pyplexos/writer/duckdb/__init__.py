@@ -4,6 +4,7 @@ from pathlib import Path
 from dataclasses import dataclass
 
 from pyplexos.protocols import PlexosReaderProtocol
+from pyplexos.writer.duckdb.silver import set_silver_schema
 
 import duckdb as duck
 import polars as pl
@@ -32,12 +33,14 @@ class DuckWriter:
         return cls(duck.connect(path.as_posix()))
 
     def create_schema(self) -> None:
-        sql = sql_resources.files("pyplexos.writer.model.sql")
+        sql = sql_resources.files("pyplexos.writer.duckdb.sql")
         bronze_schema = (sql / "bronze.sql").read_text()
-        siler_schema = (sql / "silver.sql").read_text()
+        silver_schema = (sql / "silver.sql").read_text()
+        #temp_table = (sql / "temp.sql").read_text()
 
         self.conn.sql(bronze_schema)
-        self.conn.sql(siler_schema)
+        #self.conn.sql(temp_table)
+        self.conn.sql(silver_schema)
 
     def write(self, solution: PlexosReaderProtocol) -> None:
         self.create_schema()
@@ -54,4 +57,6 @@ class DuckWriter:
             self.conn.from_arrow(pl.from_dict(table_data).to_arrow()).insert_into(
                 f"bronze.{table_name}"
             )
+        
+        set_silver_schema(self.conn)
         self.conn.close()

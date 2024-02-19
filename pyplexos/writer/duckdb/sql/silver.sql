@@ -1,13 +1,17 @@
 CREATE SCHEMA IF NOT EXISTS silver;
 
-CREATE VIEW silver.dim_centrales AS (
-    select  
-        t_membership.membership_id as id_central,
-        t_object.name as central
-    from bronze.t_membership
-    inner join bronze.t_object ON t_object.object_id = t_membership.child_object_id
-    where t_membership.collection_id == 1
-    order by t_membership.membership_id
+CREATE VIEW silver.link_generator_node AS (
+    SELECT 
+        gen_obj.object_id as id_generator,
+        node_obj.object_id as id_node,
+        gen_obj.name AS generator,
+        node_obj.name AS node,
+    FROM ((bronze.t_membership
+    INNER JOIN bronze.t_object as node_obj ON t_membership.child_object_id = node_obj.object_id)
+    INNER JOIN bronze.t_object as gen_obj ON t_membership.parent_object_id = gen_obj.object_id)
+    WHERE node_obj.class_id = 22 
+    AND gen_obj.class_id = 2 
+    AND t_membership.collection_id = 12
 );
 
 CREATE VIEW silver.dim_fechas AS (
@@ -22,14 +26,4 @@ CREATE VIEW silver.dim_fechas AS (
     order by t_phase_3.interval_id
 );
 
-CREATE VIEW silver.fct_generacion AS (
-    select 
-        t_key.membership_id as id_central,
-        t_data_0.period_id as id_periodo,
-        t_data_0.value as generacion
-    from bronze.t_data_0
-    inner join bronze.t_key on t_key.key_id = t_data_0.key_id
-    inner join bronze.t_property on t_property.property_id = t_key.property_id
-    where t_property.collection_id = 1 and t_property.name = 'Generation'
-    order by t_data_0.value, t_key.membership_id
-);
+

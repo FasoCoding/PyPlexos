@@ -2,7 +2,7 @@ from typing import Self
 from dataclasses import dataclass
 from datetime import datetime
 
-from pyplexos.reader.zip.zip_reader import PlexosZipReader
+from pyplexos.reader.zip import PlexosZipReader
 from pyplexos.protocols import PlexosReaderProtocol
 
 
@@ -28,13 +28,13 @@ class PlexosReader:
     # TODO. check si un yield se puede usar para bajar computo.
     @property
     def get_solution_model(self) -> dict[str, list[dict]]:
-        return self.solution_model.model_dump(by_alias=True)
+        return self.solution_reader.get_solution_model
 
     # TODO. check si un yield se puede usar para bajar computo.
     @property
     def get_solution_data(self) -> dict[str, dict[str, list]]:
-        return self.solution_data.model_dump(by_alias=True)
+        return self.solution_reader.get_solution_data
 
     @property
-    def get_min_datetime(self) -> datetime:
-        return self.solution_model.t_period_0[0].datetime
+    def get_initial_datetime(self) -> datetime:
+        return self.solution_reader.get_initial_datetime
