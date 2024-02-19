@@ -14,10 +14,6 @@ class PlexosZipReader:
     A class for reading plexos data from a ZIP solution file containing XML
     and binary files. On creation checks for existing files.
     """
-
-    xml_file_name: str | None = None
-    bin_file_name: str | None = None
-
     solution_model: SolutionModel = None
     solution_data: SolutionData = None
 
@@ -61,8 +57,6 @@ class PlexosZipReader:
                 )
 
         return cls(
-            xml_file_name=xml_file_name,
-            bin_file_name=bin_file_name,
             solution_model=solution_model,
             solution_data=solution_data,
         )
