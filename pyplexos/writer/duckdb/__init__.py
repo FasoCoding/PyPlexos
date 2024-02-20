@@ -35,12 +35,12 @@ class DuckWriter:
     def create_schema(self) -> None:
         sql = sql_resources.files("pyplexos.writer.duckdb.sql")
         bronze_schema = (sql / "bronze.sql").read_text()
-        silver_schema = (sql / "silver.sql").read_text()
+        #silver_schema = (sql / "silver.sql").read_text()
         #temp_table = (sql / "temp.sql").read_text()
 
         self.conn.sql(bronze_schema)
         #self.conn.sql(temp_table)
-        self.conn.sql(silver_schema)
+        #self.conn.sql(silver_schema)
 
     def write(self, solution: PlexosReaderProtocol) -> None:
         self.create_schema()
