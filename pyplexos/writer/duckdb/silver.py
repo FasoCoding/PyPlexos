@@ -13,6 +13,74 @@ object_map: dict = {
     "variable": 642,
 }
 
+def get_link_gen_node(conn: duck.DuckDBPyConnection) -> pl.LazyFrame:
+    t_membership: pl.LazyFrame = conn.table("bronze.t_membership").pl().lazy()
+    t_node_object: pl.LazyFrame = conn.table("bronze.t_object").pl().lazy()
+    t_gen_object: pl.LazyFrame = conn.table("bronze.t_object").pl().lazy()
+
+    return (
+        t_membership
+        .select(
+            pl.col("collection_id"),
+            pl.col("parent_object_id"),
+            pl.col("child_object_id"),
+        )
+        .filter(pl.col("collection_id").eq(12))
+        .join(
+            (
+                t_node_object
+                .filter(pl.col("class_id").eq(22))
+                .select(
+                    pl.col("object_id").alias("child_object_id"),
+                    pl.col("name").alias("node_name")
+                )
+            ),
+            on="child_object_id",
+            how="inner"
+        )
+        .join(
+            (
+                t_gen_object
+                .filter(pl.col("class_id").eq(2))
+                .select(
+                    pl.col("object_id").alias("parent_object_id"),
+                    pl.col("name").alias("generator_name")
+                )
+            ),
+            on="parent_object_id",
+            how="inner"
+        )
+        .select(
+            pl.col("parent_object_id").alias("id_generator"),
+            pl.col("child_object_id").alias("id_node"),
+            pl.col("generator_name"),
+            pl.col("node_name"),
+        )
+    )
+
+def get_dim_time(conn: duck.DuckDBPyConnection) -> pl.LazyFrame:
+    t_key: pl.LazyFrame = conn.table("bronze.t_key").pl().lazy()
+    phase_id: int = t_key.select(pl.col("phase_id").first()).collect().item()
+    t_phase: pl.LazyFrame = conn.table(f"bronze.t_phase_{phase_id}").pl().lazy()
+    t_period: pl.LazyFrame = conn.table("bronze.t_period_0").pl().lazy()
+
+    return (
+        t_phase
+        .join(
+            t_period,
+            on="interval_id",
+            how="inner"
+        )
+        .with_columns(
+            pl.col("datetime").dt.date().alias("date"),
+            pl.col("datetime").dt.hour().alias("time")
+        )
+        .rename({"interval_id": "id_interval",
+                 "period_id": "id_period"})
+        .sort(by="id_interval")
+    )
+
+
 def get_dim_factory(conn: duck.DuckDBPyConnection) -> pl.LazyFrame:
     t_membership: pl.LazyFrame = conn.table("bronze.t_membership").pl().lazy()
     t_object: pl.LazyFrame = conn.table("bronze.t_object").pl().lazy()
@@ -92,6 +160,11 @@ def set_silver_schema(conn: duck.DuckDBPyConnection) -> None:
 
     lazy_fct = get_fct_factory(conn)
     lazy_dim = get_dim_factory(conn)
+    lazy_date = get_dim_time(conn)
+    lazy_link = get_link_gen_node(conn)
+
+    conn.from_arrow(lazy_link.collect().to_arrow()).to_table("silver.dim_link_gen_node")
+    conn.from_arrow(lazy_date.collect().to_arrow()).to_table("silver.dim_datetime")
 
     for name, collection_value in object_map.items():
         fct = (

@@ -6,7 +6,7 @@ import time
 if __name__ == "__main__":
     print("Probando app")
     start = time.time()
-    reader = PlexosReader.zip_reader("data\Model PRGdia_Full_Definitivo Solution.zip")
+    reader = PlexosReader.zip_reader("data\Model_PID20240119_19.zip")
     # reader = PlexosZipReader.from_zip("data\Model Test15d Solution.zip")
     end = time.time()
     print(
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     )
 
     duck_writer = PlexosWriter.duck_writer(
-        path_to_dir=r"data\DuckDB", db_name="test_pcp.ddb"
+        path_to_dir=r"data\DuckDB", db_name="test_pid.ddb"
     )
     duck_writer.write(reader)
     end_duck = time.time()
