@@ -9,14 +9,34 @@ object_map: dict = {
     "reserve": 115,
     "node": 245,
     "line": 264,
-    "constrain": 635,
+    "constraint": 635,
     "variable": 642,
 }
 
-def get_link_gen_node(conn: duck.DuckDBPyConnection) -> pl.LazyFrame:
+link_map: dict = {
+    "nodes_generator": 12,
+    "fuels_generator": 6,
+    "in_storage_generator": 8,
+    "out_storage_generator": 9,
+    "constraint_generator": 29,
+    #"variables_generator": 31, no está en la lista de membership
+    "constraint_fuels": 44,
+    "constraint_storage": 84,
+    "storage_from_waterway": 91,
+    "storage_to_waterway": 92,
+    "constraint_waterway": 93,
+    "generator_reserve": 118,
+    "constraint_reserve": 128,
+    "line_from_node": 267,
+    "line_to_node": 268,
+    "constraint_line": 271,
+    "constraint_variable": 645,
+}
+
+def get_link_factory(conn: duck.DuckDBPyConnection, collection_id: int, parent_id: int, child_id: int) -> pl.LazyFrame:
     t_membership: pl.LazyFrame = conn.table("bronze.t_membership").pl().lazy()
-    t_node_object: pl.LazyFrame = conn.table("bronze.t_object").pl().lazy()
-    t_gen_object: pl.LazyFrame = conn.table("bronze.t_object").pl().lazy()
+    t_child: pl.LazyFrame = conn.table("bronze.t_object").pl().lazy()
+    t_parent: pl.LazyFrame = conn.table("bronze.t_object").pl().lazy()
 
     return (
         t_membership
@@ -25,14 +45,14 @@ def get_link_gen_node(conn: duck.DuckDBPyConnection) -> pl.LazyFrame:
             pl.col("parent_object_id"),
             pl.col("child_object_id"),
         )
-        .filter(pl.col("collection_id").eq(12))
+        .filter(pl.col("collection_id").eq(collection_id))
         .join(
             (
-                t_node_object
-                .filter(pl.col("class_id").eq(22))
+                t_child
+                .filter(pl.col("class_id").eq(child_id))
                 .select(
                     pl.col("object_id").alias("child_object_id"),
-                    pl.col("name").alias("node_name")
+                    pl.col("name").alias("child_name")
                 )
             ),
             on="child_object_id",
@@ -40,21 +60,21 @@ def get_link_gen_node(conn: duck.DuckDBPyConnection) -> pl.LazyFrame:
         )
         .join(
             (
-                t_gen_object
-                .filter(pl.col("class_id").eq(2))
+                t_parent
+                .filter(pl.col("class_id").eq(parent_id))
                 .select(
                     pl.col("object_id").alias("parent_object_id"),
-                    pl.col("name").alias("generator_name")
+                    pl.col("name").alias("parent_name")
                 )
             ),
             on="parent_object_id",
             how="inner"
         )
         .select(
-            pl.col("parent_object_id").alias("id_generator"),
-            pl.col("child_object_id").alias("id_node"),
-            pl.col("generator_name"),
-            pl.col("node_name"),
+            pl.col("parent_object_id"),
+            pl.col("child_object_id"),
+            pl.col("parent_name"),
+            pl.col("child_name"),
         )
     )
 
@@ -157,15 +177,30 @@ def get_fct_factory(conn: duck.DuckDBPyConnection) -> pl.LazyFrame:
 
 def set_silver_schema(conn: duck.DuckDBPyConnection) -> None:
     conn.sql("CREATE SCHEMA IF NOT EXISTS silver")
+    
+    lazy_date = get_dim_time(conn)
+    conn.from_arrow(lazy_date.collect().to_arrow()).to_table("silver.dim_datetime")
+
+    t_collection: pl.LazyFrame = conn.table("bronze.t_collection").pl().lazy()
+    for name, collection_value in link_map.items():
+        filter_collection: pl.LazyFrame = t_collection.filter(pl.col("collection_id").eq(collection_value))
+        child_id: int = filter_collection.select(pl.col("child_class_id")).collect().item()
+        parent_id: int = filter_collection.select(pl.col("parent_class_id")).collect().item()
+        parent_name: str = filter_collection.select(pl.col("complement_name")).collect().item().lower()
+        child_name: str = filter_collection.select(pl.col("name")).collect().item().lower()
+        lazy_link: pl.LazyFrame = get_link_factory(conn, collection_value, parent_id, child_id)
+        lazy_link = lazy_link.rename(
+            {
+                "parent_object_id": f"id_{parent_name}",
+                "child_object_id": f"id_{child_name}",
+                "parent_name": f"{parent_name}_name",
+                "child_name": f"{child_name}_name",
+            }
+        )
+        conn.from_arrow(lazy_link.collect().to_arrow()).to_table(f"silver.lnk_{name}")
 
     lazy_fct = get_fct_factory(conn)
     lazy_dim = get_dim_factory(conn)
-    lazy_date = get_dim_time(conn)
-    lazy_link = get_link_gen_node(conn)
-
-    conn.from_arrow(lazy_link.collect().to_arrow()).to_table("silver.dim_link_gen_node")
-    conn.from_arrow(lazy_date.collect().to_arrow()).to_table("silver.dim_datetime")
-
     for name, collection_value in object_map.items():
         fct = (
             lazy_fct
