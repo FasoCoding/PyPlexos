@@ -39,6 +39,7 @@ class PlexosZipReader:
                 if file_name == "t_data_0.BIN":
                     bin_file_name: str = file_name
 
+
         # check if the files were found or raise error.
         if xml_file_name is None:
             raise ValueError("No model file on zip solution.")

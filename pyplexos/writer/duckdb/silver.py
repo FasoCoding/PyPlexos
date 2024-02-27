@@ -71,6 +71,7 @@ def get_link_factory(conn: duck.DuckDBPyConnection, collection_id: int, parent_i
             how="inner"
         )
         .select(
+
             pl.col("parent_object_id"),
             pl.col("child_object_id"),
             pl.col("parent_name"),
@@ -201,6 +202,7 @@ def set_silver_schema(conn: duck.DuckDBPyConnection) -> None:
 
     lazy_fct = get_fct_factory(conn)
     lazy_dim = get_dim_factory(conn)
+
     for name, collection_value in object_map.items():
         fct = (
             lazy_fct
