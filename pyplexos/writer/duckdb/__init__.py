@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from pyplexos.protocols import PlexosReaderProtocol
 from pyplexos.writer.duckdb.silver import set_silver_schema
+from pyplexos.writer.duckdb.gold import set_gold_schema
 
 import duckdb as duck
 import polars as pl
@@ -59,4 +60,5 @@ class DuckWriter:
             )
         
         set_silver_schema(self.conn)
+        set_gold_schema(self.conn)
         self.conn.close()
