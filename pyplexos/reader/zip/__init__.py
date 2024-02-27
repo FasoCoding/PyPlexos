@@ -35,9 +35,10 @@ class PlexosZipReader:
         with ZipFile(zip_file_path, "r") as zip_ref:
             for file_name in zip_ref.namelist():
                 if file_name.startswith("Model") and file_name.endswith(".xml"):
-                    xml_file_name = file_name
+                    xml_file_name: str = file_name
                 if file_name == "t_data_0.BIN":
-                    bin_file_name = file_name
+                    bin_file_name: str = file_name
+
 
         # check if the files were found or raise error.
         if xml_file_name is None:
@@ -48,7 +49,7 @@ class PlexosZipReader:
         # extract the model and binary data
         with ZipFile(zip_file_path, "r") as zip_ref:
             with zip_ref.open(xml_file_name) as xml_file:
-                content = xml_file.read().decode("utf-8")
+                content: str = xml_file.read().decode("utf-8")
                 solution_model = SolutionModel.from_xml(content)
             with zip_ref.open(bin_file_name) as bin_file:
                 binary_data = bin_file.read()
