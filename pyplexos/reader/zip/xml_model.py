@@ -406,8 +406,6 @@ class Phase4Table(BaseXmlModel, tag="t_phase_4", nsmap=NSMAP, skip_empty=True):
 class SolutionModel(BaseXmlModel, tag="SolutionDataset", nsmap=NSMAP):
     """
     Class to represent a complete solution of plexos .xml file.
-
-    This class only work for a PCP solution.
     """
 
     t_unit: list[UnitTable]

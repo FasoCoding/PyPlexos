@@ -1,6 +1,6 @@
 from pathlib import Path
 from zipfile import ZipFile
-from typing import Self
+from typing import Self, Any
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -14,8 +14,8 @@ class PlexosZipReader:
     A class for reading plexos data from a ZIP solution file containing XML
     and binary files. On creation checks for existing files.
     """
-    solution_model: SolutionModel = None
-    solution_data: SolutionData = None
+    solution_model: SolutionModel
+    solution_data: SolutionData
 
     @classmethod
     def from_zip(cls, zip_path: str) -> Self:
@@ -64,14 +64,14 @@ class PlexosZipReader:
 
     # TODO. check si un yield se puede usar para bajar computo.
     @property
-    def get_solution_model(self) -> dict[str, list[dict]]:
+    def get_solution_model(self) -> dict[str, Any]:
         return self.solution_model.model_dump(by_alias=True)
 
     # TODO. check si un yield se puede usar para bajar computo.
     @property
-    def get_solution_data(self) -> dict[str, dict[str, list]]:
+    def get_solution_data(self) -> dict[str, dict[str, Any]]:
         return self.solution_data.model_dump(by_alias=True)
     
     @property
-    def get_min_datetime(self) -> datetime:
+    def get_initial_datetime(self) -> datetime:
         return self.solution_model.t_period_0[0].datetime

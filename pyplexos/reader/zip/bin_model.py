@@ -2,13 +2,7 @@ from pydantic import BaseModel
 from typing import Optional, Self
 from struct import unpack
 
-
-class KeyIndexTable(BaseModel):
-    key_id: int
-    period_type_id: int
-    position: int
-    length: int
-    period_offset: int
+from pyplexos.reader.zip.xml_model import KeyIndexTable
 
 
 class DataTable(BaseModel):
@@ -40,9 +34,9 @@ class SolutionData(BaseModel):
             SolutionData: The SolutionData with processed t_key_index data.
 
         """
-        key_ids = []
-        period_ids = []
-        values = []
+        key_ids:list[int] = []
+        period_ids: list[int] = []
+        values: list[float] = []
 
         for data in t_key_index:
             if data.period_type_id != 0:
@@ -70,7 +64,7 @@ def read_double_values(binary_data: bytes) -> list[float]:
         List[float]: The list of double values.
 
     """
-    num_values = len(binary_data) // 8
-    format_string = f"{num_values}d"
-    double_values = list(unpack(format_string, binary_data))
+    num_values: int = len(binary_data) // 8
+    format_string: str = f"{num_values}d"
+    double_values: list[float] = list(unpack(format_string, binary_data))
     return double_values

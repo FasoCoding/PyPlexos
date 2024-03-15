@@ -11,7 +11,7 @@ import duckdb as duck
 import polars as pl
 
 
-@dataclass
+#@dataclass
 class DuckWriter:
     conn: duck.DuckDBPyConnection
 
@@ -31,7 +31,7 @@ class DuckWriter:
 
         if path.exists() and mode == "replace":
             path.unlink()
-        return cls(duck.connect(path.as_posix()))
+        return cls(conn = duck.connect(path.as_posix()))
 
     def create_schema(self) -> None:
         sql = sql_resources.files("pyplexos.writer.duckdb.sql")
