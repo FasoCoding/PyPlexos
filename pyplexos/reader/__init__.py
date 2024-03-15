@@ -1,4 +1,4 @@
-from typing import Self
+from typing import Self, Any
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -27,12 +27,12 @@ class PlexosReader:
 
     # TODO. check si un yield se puede usar para bajar computo.
     @property
-    def get_solution_model(self) -> dict[str, list[dict]]:
+    def get_solution_model(self) -> dict[str, list[dict[str, Any]]]:
         return self.solution_reader.get_solution_model
 
     # TODO. check si un yield se puede usar para bajar computo.
     @property
-    def get_solution_data(self) -> dict[str, dict[str, list]]:
+    def get_solution_data(self) -> dict[str, dict[str, list[Any]]]:
         return self.solution_reader.get_solution_data
 
     @property
