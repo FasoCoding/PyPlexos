@@ -39,10 +39,20 @@ no_implicit_reexport = true
 # for strict mypy: (this is the tricky one :-))
 disallow_untyped_defs = true
 
+[[tool.mypy.overrides]]
+module = [
+  "pyarrow",
+]
+ignore_missing_imports = true
+
 [tool.pydantic-mypy]
 init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
+
+[tool.mypy-pyarrow]
+follow_imports = false
+ignore_missing_imports = true
 
 [build-system]
 requires = ["poetry-core"]
