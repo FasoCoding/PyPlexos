@@ -1,6 +1,5 @@
-from typing import Self, Any
+from typing import Self
 from dataclasses import dataclass
-from datetime import datetime
 
 from pyplexos.reader.zip import PlexosZipReader
 from pyplexos.protocols import PlexosReaderProtocol
@@ -23,18 +22,18 @@ class PlexosReader:
         Args:
             zip_file_path (str): The path to the ZIP file.
         """
-        return cls(solution_reader=PlexosZipReader.from_zip(zip_path=path))
+        return cls(solution_reader=PlexosZipReader.read(zip_path=path))
 
     # TODO. check si un yield se puede usar para bajar computo.
-    @property
-    def get_solution_model(self) -> dict[str, list[dict[str, Any]]]:
-        return self.solution_reader.get_solution_model
+    #@property
+    #def get_solution_model(self) -> dict[str, list[dict[str, Any]]]:
+    #    return self.solution_reader.get_solution_model
 
     # TODO. check si un yield se puede usar para bajar computo.
-    @property
-    def get_solution_data(self) -> dict[str, dict[str, list[Any]]]:
-        return self.solution_reader.get_solution_data
+    #@property
+    #def get_solution_data(self) -> dict[str, dict[str, list[Any]]]:
+    #    return self.solution_reader.get_solution_data
 
-    @property
-    def get_initial_datetime(self) -> datetime:
-        return self.solution_reader.get_initial_datetime
+    #@property
+    #def get_initial_datetime(self) -> datetime:
+    #    return self.solution_reader.get_initial_datetime

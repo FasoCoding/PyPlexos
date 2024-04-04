@@ -1,19 +1,22 @@
-from typing import Protocol, List, Dict, Any
+from typing import Protocol, List, Dict, Any, Optional
 from datetime import datetime
 
 
 class PlexosReaderProtocol(Protocol):
-    @property
-    def get_solution_model(self) -> dict[str, list[dict[str, str]]]:
+    def read(self) -> None:
         ...
 
-    @property
-    def get_solution_data(self) -> dict[str, dict[str, List[Any]]]:
-        ...
-
-    @property
-    def get_initial_datetime(self) -> datetime:
-        ...
+    #@property
+    #def get_solution_model(self) -> dict[str, list[dict[str, str]]]:
+    #    ...
+#
+    #@property
+    #def get_solution_data(self) -> dict[str, dict[str, List[Any]]]:
+    #    ...
+#
+    #@property
+    #def get_initial_datetime(self) -> datetime:
+    #    ...
 
 
 class WriterModelProtocol(Protocol):

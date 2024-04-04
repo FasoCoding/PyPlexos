@@ -34,7 +34,7 @@ class SolutionData(BaseModel):
             SolutionData: The SolutionData with processed t_key_index data.
 
         """
-        key_ids:list[int] = []
+        key_ids: list[int] = []
         period_ids: list[int] = []
         values: list[float] = []
 
