@@ -1,4 +1,4 @@
-from typing import Protocol, List, Dict, Any, Optional
+from typing import Protocol, List, Dict, Any
 from datetime import datetime
 
 
