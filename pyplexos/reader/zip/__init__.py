@@ -1,12 +1,54 @@
 from pathlib import Path
 from zipfile import ZipFile
 from datetime import datetime
+from enum import Enum
 
 import pyarrow as pa
 
 from pyplexos.reader.zip.xml_model import SolutionModel
 from pyplexos.reader.zip.bin_model import SolutionData
-from pyplexos.reader.zip.errors import XMLFileError, BinFileError, ZipFileError
+from pyplexos.reader.zip.errors import (
+    XMLFileError,
+    BinFileError,
+    ZipFileError,
+    TableNotFoundError,
+)
+
+class SolutionSchema(Enum):
+    t_unit: str = "t_unit"
+    t_band: str = "t_band"
+    t_category: str = "t_category"
+    t_class: str = "t_class"
+    t_class_group: str = "t_class_group"
+    t_collection: str = "t_collection"
+    t_config: str = "t_config"
+    t_key: str = "t_key"
+    t_membership: str = "t_membership"
+    t_model: str = "t_model"
+    t_object: str = "t_object"
+    t_period_0: str = "t_period_0"
+    t_period_1: str = "t_period_1"
+    t_period_2: str = "t_period_2"
+    t_period_3: str = "t_period_3"
+    t_period_4: str = "t_period_4"
+    t_period_6: str = "t_period_6"
+    t_period_7: str = "t_period_7"
+    t_phase_1: str = "t_phase_1"
+    t_phase_2: str = "t_phase_2"
+    t_phase_3: str = "t_phase_3"
+    t_phase_4: str = "t_phase_4"
+    t_sample: str = "t_sample"
+    t_timeslice: str = "t_timeslice"
+    t_key_index: str = "t_key_index"
+    t_property: str = "t_property"
+    t_attribute_data: str = "t_attribute_data"
+    t_attribute: str = "t_attribute"
+    t_sample_weight: str = "t_sample_weight"
+    t_custom_column: str = "t_custom_column"
+    t_memo_object: str = "t_memo_object"
+    t_object_meta: str = "t_object_meta"
+    t_data_0: str = "t_data_0"
+
 
 class PlexosZipReader:
     """
@@ -128,39 +170,39 @@ class PlexosZipReader:
         solution_data_dict = solution_data.model_dump(by_alias=True)
 
         # List of tables for plexos solution.
-        self._t_unit: pa.Table = pa.Table.from_pylist(solution_model_dict["t_unit"])
-        self._t_band= pa.Table.from_pylist(solution_model_dict["t_band"])
-        self._t_category= pa.Table.from_pylist(solution_model_dict["t_category"])
-        self._t_class= pa.Table.from_pylist(solution_model_dict["t_class"])
-        self._t_class_group= pa.Table.from_pylist(solution_model_dict["t_class_group"])
-        self._t_collection= pa.Table.from_pylist(solution_model_dict["t_collection"])
-        self._t_config= pa.Table.from_pylist(solution_model_dict["t_config"])
-        self._t_key= pa.Table.from_pylist(solution_model_dict["t_key"])
-        self._t_membership= pa.Table.from_pylist(solution_model_dict["t_membership"])
-        self._t_model= pa.Table.from_pylist(solution_model_dict["t_model"])
-        self._t_object= pa.Table.from_pylist(solution_model_dict["t_object"])
-        self._t_period_0= pa.Table.from_pylist(solution_model_dict["t_period_0"])
-        self._t_period_1 = pa.Table.from_pylist(solution_model_dict["t_period_1"])
-        self._t_period_2= pa.Table.from_pylist(solution_model_dict["t_period_2"])
-        self._t_period_3= pa.Table.from_pylist(solution_model_dict["t_period_3"])
-        self._t_period_4= pa.Table.from_pylist(solution_model_dict["t_period_4"])
-        self._t_period_6= pa.Table.from_pylist(solution_model_dict["t_period_6"])
-        self._t_period_7= pa.Table.from_pylist(solution_model_dict["t_period_7"])
-        self._t_phase_1= pa.Table.from_pylist(solution_model_dict["t_phase_1"])
-        self._t_phase_2= pa.Table.from_pylist(solution_model_dict["t_phase_2"])
-        self._t_phase_3= pa.Table.from_pylist(solution_model_dict["t_phase_3"])
-        self._t_phase_4= pa.Table.from_pylist(solution_model_dict["t_phase_4"])
-        self._t_sample= pa.Table.from_pylist(solution_model_dict["t_sample"])
-        self._t_timeslice= pa.Table.from_pylist(solution_model_dict["t_timeslice"])
-        self._t_key_index= pa.Table.from_pylist(solution_model_dict["t_key_index"])
-        self._t_property= pa.Table.from_pylist(solution_model_dict["t_property"])
-        self._t_attribute_data= pa.Table.from_pylist(solution_model_dict["t_attribute_data"])
-        self._t_attribute= pa.Table.from_pylist(solution_model_dict["t_attribute"])
-        self._t_sample_weight= pa.Table.from_pylist(solution_model_dict["t_sample_weight"])
-        self._t_custom_column= pa.Table.from_pylist(solution_model_dict["t_custom_column"])
-        self._t_memo_object= pa.Table.from_pylist(solution_model_dict["t_memo_object"])
-        self._t_object_meta= pa.Table.from_pylist(solution_model_dict["t_object_meta"])
-        self._t_data_0= pa.Table.from_pydict(solution_data_dict["t_data_0"])
+        self._t_unit: pa.Table = pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_unit.value])
+        self._t_band= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_band.value])
+        self._t_category= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_category.value])
+        self._t_class= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_class.value])
+        self._t_class_group= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_class_group.value])
+        self._t_collection= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_collection.value])
+        self._t_config= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_config.value])
+        self._t_key= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_key.value])
+        self._t_membership= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_membership.value])
+        self._t_model= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_model.value])
+        self._t_object= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_object.value])
+        self._t_period_0= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_period_0.value])
+        self._t_period_1 = pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_period_1.value])
+        self._t_period_2= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_period_2.value])
+        self._t_period_3= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_period_3.value])
+        self._t_period_4= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_period_4.value])
+        self._t_period_6= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_period_6.value])
+        self._t_period_7= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_period_7.value])
+        self._t_phase_1= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_phase_1.value])
+        self._t_phase_2= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_phase_2.value])
+        self._t_phase_3= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_phase_3.value])
+        self._t_phase_4= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_phase_4.value])
+        self._t_sample= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_sample.value])
+        self._t_timeslice= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_timeslice.value])
+        self._t_key_index= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_key_index.value])
+        self._t_property= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_property.value])
+        self._t_attribute_data= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_attribute_data.value])
+        self._t_attribute= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_attribute.value])
+        self._t_sample_weight= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_sample_weight.value])
+        self._t_custom_column= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_custom_column.value])
+        self._t_memo_object= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_memo_object.value])
+        self._t_object_meta= pa.Table.from_pylist(solution_model_dict[SolutionSchema.t_object_meta.value])
+        self._t_data_0= pa.Table.from_pydict(solution_data_dict[SolutionSchema.t_data_0.value])
 
 
     def _get_min_datetime(self, solution_model: SolutionModel) -> datetime:
@@ -213,6 +255,7 @@ class PlexosZipReader:
 
         return solution_model.t_period_0[min_interval].datetime
     
+    # TODO. Check should be on XML validation.
     def _get_server_name(self, solution_model: SolutionModel) -> str:
         """
         Extracts the server name from the solution model where the Plexos simulation was executed.
@@ -260,5 +303,84 @@ class PlexosZipReader:
         return prg_server
 
 
-    #def list_tables(self) -> list[str]:
-    #    ...
+    def list_tables(self) -> list[str]:
+        return [table.value for table in SolutionSchema]
+    
+    def table(self, table_name: str) -> pa.Table:
+
+        if table_name in self.list_tables():
+            table = SolutionSchema[table_name]
+        else:
+            raise KeyError(f"Table {table_name} not in schema")
+
+        match table:
+            case SolutionSchema.t_unit: 
+                return self._t_unit
+            case SolutionSchema.t_band: 
+                return self._t_band
+            case SolutionSchema.t_category: 
+                return self._t_category
+            case SolutionSchema.t_class: 
+                return self._t_class
+            case SolutionSchema.t_class_group: 
+                return self._t_class_group
+            case SolutionSchema.t_collection: 
+                return self._t_collection
+            case SolutionSchema.t_config: 
+                return self._t_config
+            case SolutionSchema.t_key: 
+                return self._t_key
+            case SolutionSchema.t_membership: 
+                return self._t_membership
+            case SolutionSchema.t_model: 
+                return self._t_model
+            case SolutionSchema.t_object: 
+                return self._t_object
+            case SolutionSchema.t_period_0: 
+                return self._t_period_0
+            case SolutionSchema.t_period_1: 
+                return self._t_period_1
+            case SolutionSchema.t_period_2: 
+                return self._t_period_2
+            case SolutionSchema.t_period_3: 
+                return self._t_period_3
+            case SolutionSchema.t_period_4: 
+                return self._t_period_4
+            case SolutionSchema.t_period_6: 
+                return self._t_period_6
+            case SolutionSchema.t_period_7: 
+                return self._t_period_7
+            case SolutionSchema.t_phase_1: 
+                return self._t_phase_1
+            case SolutionSchema.t_phase_2: 
+                return self._t_phase_2
+            case SolutionSchema.t_phase_3: 
+                return self._t_phase_3
+            case SolutionSchema.t_phase_4: 
+                return self._t_phase_4
+            case SolutionSchema.t_sample: 
+                return self._t_sample
+            case SolutionSchema.t_timeslice: 
+                return self._t_timeslice
+            case SolutionSchema.t_key_index: 
+                return self._t_key_index
+            case SolutionSchema.t_property: 
+                return self._t_property
+            case SolutionSchema.t_attribute_data: 
+                return self._t_attribute_data
+            case SolutionSchema.t_attribute: 
+                return self._t_attribute
+            case SolutionSchema.t_sample_weight: 
+                return self._t_sample_weight
+            case SolutionSchema.t_custom_column: 
+                return self._t_custom_column
+            case SolutionSchema.t_memo_object: 
+                return self._t_memo_object
+            case SolutionSchema.t_object_meta: 
+                return self._t_object_meta
+            case SolutionSchema.t_data_0: 
+                return self._t_data_0
+        #return getattr(self, "_" + table.value)
+
+#def read_zip(path_to_zip: str) -> None:
+#    
