@@ -3,8 +3,9 @@ from typing import Callable
 
 from pyplexos.reader.schema import PlexosSolution
 from pyplexos.reader.zip import read_zip
+from pyplexos.reader.accdb import read_accdb
 
-ReaderFunction = Callable[[str], PlexosSolution]
+ReaderFunction = Callable[[], PlexosSolution]
 
 
 def reader(reader_type: str, path: str) -> ReaderFunction:
@@ -38,5 +39,7 @@ def reader(reader_type: str, path: str) -> ReaderFunction:
     match reader_type.lower():
         case "zip":
             return partial(read_zip, path)
+        case "accdb":
+            return partial(read_accdb, path)
         case _:
             raise ValueError(f"No reader for {reader_type}")
