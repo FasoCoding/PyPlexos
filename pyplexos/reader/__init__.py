@@ -1,41 +1,42 @@
-#from typing import Self
-#from dataclasses import dataclass
+from functools import partial
+from typing import Callable
 
-from pyplexos.reader.zip import PlexosZipReader
-#from pyplexos.protocols import PlexosReaderProtocol
+from pyplexos.reader.schema import PlexosSolution
+from pyplexos.reader.zip import read_zip
 
-#import pyplexos.reader.zip
+ReaderFunction = Callable[[str], PlexosSolution]
 
 
-#@dataclass
-#class PlexosReader:
-#    """
-#    A class for reading plexos data from a ZIP solution file containing XML
-#    and binary files. On creation checks for existing files.
-#    """
-#
-#    solution_reader: PlexosReaderProtocol
-#
-#    @classmethod
-#    def zip_reader(cls, path: str) -> Self:
-#        """
-#        Initialize a PlexosZipReader object from a zip file.
-#
-#        Args:
-#            zip_file_path (str): The path to the ZIP file.
-#        """
-#        return cls(solution_reader=PlexosZipReader.read(zip_path=path))
-#
-#    # TODO. check si un yield se puede usar para bajar computo.
-#    #@property
-#    #def get_solution_model(self) -> dict[str, list[dict[str, Any]]]:
-#    #    return self.solution_reader.get_solution_model
-#
-#    # TODO. check si un yield se puede usar para bajar computo.
-#    #@property
-#    #def get_solution_data(self) -> dict[str, dict[str, list[Any]]]:
-#    #    return self.solution_reader.get_solution_data
-#
-#    #@property
-#    #def get_initial_datetime(self) -> datetime:
-#    #    return self.solution_reader.get_initial_datetime
+def reader(reader_type: str, path: str) -> ReaderFunction:
+    """
+    Returns a partially applied reader function based on the specified reader type.
+    This function is designed to dynamically select and configure a reader function that
+    is specialized for different types of data sources (e.g., ZIP files, ACCDB files).
+
+    Parameters:
+    - reader_type (str): The type of reader to return. Current supported types include "zip".
+                         More types like "accdb" can be added later.
+    - path (str): The file path or connection string to be used by the reader function.
+
+    Returns:
+    - ReaderFunction: A callable that takes a path string and returns a PlexosSolution object.
+                      This callable is a partially applied function that is ready to be executed
+                      with its required arguments.
+
+    Raises:
+    - ValueError: If no reader function is available for the specified `reader_type`.
+
+    Example:
+    - To get a reader function for ZIP files:
+        zip_reader = reader("zip", "path/to/file.zip")
+        solution = zip_reader()
+
+    Note:
+    - This function uses `functools.partial` to pre-configure the reader functions with the
+      necessary `path`, making the returned function ready to be called without any parameters.
+    """
+    match reader_type.lower():
+        case "zip":
+            return partial(read_zip, path)
+        case _:
+            raise ValueError(f"No reader for {reader_type}")
