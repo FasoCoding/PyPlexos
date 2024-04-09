@@ -1,7 +1,7 @@
 from functools import partial
 from typing import Callable
 
-from pyplexos.reader.schema import PlexosSolution
+from pyplexos.schema import PlexosSolution
 from pyplexos.reader.zip import read_zip
 from pyplexos.reader.accdb import read_accdb
 

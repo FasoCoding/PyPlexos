@@ -10,7 +10,7 @@ from sqlalchemy import (
 import pyarrow as pa
 import polars as pl
 
-from pyplexos.reader.schema import PlexosSolution, SolutionSchema
+from pyplexos.schema import PlexosSolution, SolutionSchema
 
 def read_accdb(accdb_file_path: str) -> PlexosSolution:
     path = Path(accdb_file_path)

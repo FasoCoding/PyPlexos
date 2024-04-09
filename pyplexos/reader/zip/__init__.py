@@ -4,7 +4,7 @@ from zipfile import ZipFile
 
 import pyarrow as pa
 
-from pyplexos.reader.schema import PlexosSolution, SolutionSchema
+from pyplexos.schema import PlexosSolution, SolutionSchema
 from pyplexos.reader.zip.bin_model import SolutionData
 from pyplexos.reader.zip.errors import (
     BinFileError,
