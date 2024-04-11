@@ -1,32 +1,17 @@
 from pathlib import Path
-from dataclasses import dataclass
-from typing import Self
+from typing import Any
 
-from pyplexos.protocols import PlexosReaderProtocol
-
-import polars as pl
+import pyarrow as pa
 
 
-@dataclass
-class ParquetWriter:
-    path_to_dir: Path
+def write_parquet(
+    path_to_folder: str, table_name: str, table_data: pa.Table, **kwargs: Any
+) -> None:
+    path = Path(path_to_folder)
 
-    @classmethod
-    def parquet_writer(cls, path_to_dir: str) -> Self:
-        temp_path = Path(path_to_dir)
-        if not temp_path.exists():
-            raise ValueError(f"Path: {path_to_dir} does not exists.")
-        return cls(path_to_dir=temp_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Path does not exists: {path_to_folder}")
 
-    def write(self, solution: PlexosReaderProtocol) -> None:
-        for table_name, table_data in solution.get_solution_model.items():
-            if table_data is None:
-                continue
-            file = self.path_to_dir / table_name
-            pl.from_dicts(table_data).write_parquet(file.with_suffix(".parquet"))
+    path_to_write: Path = path / table_name
 
-        for table_name, table_data in solution.get_solution_data.items():
-            if table_data is None:
-                continue
-            file = self.path_to_dir / table_name
-            pl.from_dict(table_data).write_parquet(file.with_suffix(".parquet"))
+    pa.parquet.write_table(table_data, path_to_write.with_suffix(".parquet"), **kwargs)
