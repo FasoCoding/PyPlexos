@@ -1,64 +1,19 @@
-import importlib.resources as sql_resources
-
 from pathlib import Path
-from dataclasses import dataclass
-
-from pyplexos.protocols import PlexosReaderProtocol
-from pyplexos.writer.duckdb.silver import set_silver_schema
-from pyplexos.writer.duckdb.gold import set_gold_schema
+from typing import Any
 
 import duckdb as duck
-import polars as pl
+import pyarrow as pa
 
 
-#@dataclass
-class DuckWriter:
-    conn: duck.DuckDBPyConnection
+def write_duckdb(
+    path_to_db: str, table_dict: dict[str, pa.Table], **kwargs: Any
+) -> None:
+    path = Path(path_to_db)
 
-    @classmethod
-    def create_medallion_duck(
-        cls, path_to_db: Path, db_name: str, mode: str = "replace"
-    ) -> duck.DuckDBPyConnection:
-        """Create a duckdb connection from plexos solution.
+    if not path.exists():
+        raise FileNotFoundError(f"Path does not exists: {path_to_db}")
 
-        Returns:
-            duck.DuckDBPyConnection: Connection to duckdb.
-        """
-        temp_path = Path(path_to_db)
-        if not temp_path.exists():
-            raise ValueError(f"Path: {path_to_db} does not exists.")
-        path = temp_path / db_name
+    conn = duck.connect(path.as_posix())
 
-        if path.exists() and mode == "replace":
-            path.unlink()
-        return cls(conn = duck.connect(path.as_posix()))
-
-    def create_schema(self) -> None:
-        sql = sql_resources.files("pyplexos.writer.duckdb.sql")
-        bronze_schema = (sql / "bronze.sql").read_text()
-        #silver_schema = (sql / "silver.sql").read_text()
-        #temp_table = (sql / "temp.sql").read_text()
-
-        self.conn.sql(bronze_schema)
-        #self.conn.sql(temp_table)
-        #self.conn.sql(silver_schema)
-
-    def write(self, solution: PlexosReaderProtocol) -> None:
-        self.create_schema()
-        for table_name, table_data in solution.get_solution_model.items():
-            if table_data is None:
-                continue
-            self.conn.from_arrow(pl.from_dicts(table_data).to_arrow()).insert_into(
-                f"bronze.{table_name}"
-            )
-
-        for table_name, table_data in solution.get_solution_data.items():
-            if table_data is None:
-                continue
-            self.conn.from_arrow(pl.from_dict(table_data).to_arrow()).insert_into(
-                f"bronze.{table_name}"
-            )
-        
-        set_silver_schema(self.conn)
-        set_gold_schema(self.conn)
-        self.conn.close()
+    for name, data in table_dict.items():
+        conn.from_arrow(data).insert_into(table_name=name)

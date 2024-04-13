@@ -3,10 +3,10 @@ from typing import Callable
 
 import pyarrow as pa
 
-from pyplexos.writer.duckdb import DuckWriter
+from pyplexos.writer.duckdb import write_duckdb
 from pyplexos.writer.parquet import write_parquet
 
-WriterFunction = Callable[[str, pa.Table], None]
+WriterFunction = Callable[[dict[str, pa.Table]], None]
 
 
 def writer(writer_type: str, path: str) -> WriterFunction:
@@ -43,7 +43,7 @@ def writer(writer_type: str, path: str) -> WriterFunction:
             return partial(write_duckdb, path)
         case "parquet":
             return partial(write_parquet, path)
-        case "accdb":
-            return partial(write_accdb, path)
+        #case "accdb":
+        #    return partial(write_accdb, path)
         case _:
             raise ValueError(f"No writer for {writer_type}")
