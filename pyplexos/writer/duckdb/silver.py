@@ -1,7 +1,7 @@
 import duckdb as duck
 import polars as pl
 
-object_map: dict = {
+object_map: dict[str,int] = {
     "generator": 1,
     "fuel": 33,
     "storage": 80,
@@ -13,7 +13,7 @@ object_map: dict = {
     "variable": 642,
 }
 
-link_map: dict = {
+link_map: dict[str,int] = {
     "nodes_generator": 12,
     "fuels_generator": 6,
     "in_storage_generator": 8,

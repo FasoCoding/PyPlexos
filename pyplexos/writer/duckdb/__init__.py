@@ -13,7 +13,13 @@ def write_duckdb(
     if not path.exists():
         raise FileNotFoundError(f"Path does not exists: {path_to_db}")
 
-    conn = duck.connect(path.as_posix())
+    db_path = path / "prg.duckdb"
+    
+    conn = duck.connect(db_path.as_posix())
 
     for name, data in table_dict.items():
-        conn.from_arrow(data).insert_into(table_name=name)
+        if data.num_columns == 0:
+            continue 
+        conn.from_arrow(data).create(table_name=name)
+    
+    conn.close()
