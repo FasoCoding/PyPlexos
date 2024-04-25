@@ -9,11 +9,16 @@ def write_duckdb(
     path_to_db: str, table_dict: dict[str, pa.Table], **kwargs: Any
 ) -> None:
     path = Path(path_to_db)
+    db_name = "prg.duckdb"
+
+    if "db_name" in kwargs:
+        db_name = kwargs["db_name"]
 
     if not path.exists():
         raise FileNotFoundError(f"Path does not exists: {path_to_db}")
 
-    db_path = path / "prg.duckdb"
+    
+    db_path = path / db_name
     
     conn = duck.connect(db_path.as_posix())
 
