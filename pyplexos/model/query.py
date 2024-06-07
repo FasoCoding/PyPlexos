@@ -13,6 +13,7 @@ class QueryCollection(Enum):
     VARIABLE = 642
 
 class GeneratorProperty(Enum):
+    COLLECTION = 1
     GENERATION = 1
     UNITS_GENERATING = 6
     DISPATCHABLE_CAPACITY = 9
@@ -29,10 +30,12 @@ class GeneratorProperty(Enum):
     AVAILABLE_CAPACITY = 219
 
 class FuelProperty(Enum):
+    COLLECTION = 33
     OFFTAKE = 344
     SHADOW_PRICE = 361
 
 class StorageProperty(Enum):
+    COLLECTION = 80
     MAX_VOLUME = 478
     MIN_VOLUME = 479
     INITIAL_VOLUME = 480
@@ -42,12 +45,14 @@ class StorageProperty(Enum):
     NON_PHYSICAL_INFLOW = 524
 
 class WaterwayProperty(Enum):
+    COLLECTION = 88
     FLOW = 529
     MAX_FLOW = 530
     MIN_FLOW = 531
     SHADOW_PRICE = 533
 
 class ReserveProperty(Enum):
+    COLLECTION = 115
     PROVISION = 586
     SHORTAGE = 588
     CLEARED_OFFER_PRICE = 591
@@ -55,6 +60,7 @@ class ReserveProperty(Enum):
     AVAILABLE_RESPONSE = 596
 
 class NodeProperty(Enum):
+    COLLECTION = 245
     LOAD = 1200
     GENERATION = 1204
     UNSERVED_ENERGY = 1229
@@ -64,6 +70,7 @@ class NodeProperty(Enum):
     PHASE_ANGLE = 1239
 
 class LineProperty(Enum):
+    COLLECTION = 264
     FLOW = 1274
     EXPORT_LIMIT = 1277
     IMPORT_LIMIT = 1278
@@ -73,6 +80,7 @@ class LineProperty(Enum):
     UNITS_OUT = 1328
 
 class ConstraintProperty(Enum):
+    COLECTION = 635
     ACTIVITY = 2642
     SLACK = 2643
     HOURS_BINDING = 2645
@@ -80,10 +88,23 @@ class ConstraintProperty(Enum):
     PRICE = 2647
 
 class DecisionVariableProperty(Enum):
+    COLLECTION = 642
     Value = 2660
 
 @dataclass
 class QueryProperty:
+    GENERATOR = GeneratorProperty
+    FUEL = FuelProperty
+    STORAGE = StorageProperty
+    WATERWAY = WaterwayProperty
+    RESERVE = ReserveProperty
+    NODE = NodeProperty
+    LINE = LineProperty
+    CONSTRAINT = ConstraintProperty
+    DECISION_VARIABLE = DecisionVariableProperty
+
+@dataclass
+class QuerySchema:
     GENERATOR = GeneratorProperty
     FUEL = FuelProperty
     STORAGE = StorageProperty
