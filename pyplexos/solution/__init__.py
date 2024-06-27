@@ -269,6 +269,8 @@ class PlexosSolution:
                     "child_name",
                     "property_name",
                     "datetime",
+                    "day",
+                    "hour",
                     "value",
                 ]
             )
