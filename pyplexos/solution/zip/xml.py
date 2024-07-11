@@ -434,7 +434,12 @@ class SolutionModel(BaseModel):
 
     @classmethod
     def from_xml(cls, xml_file: str | IO[bytes]):
-        
+        namespace = {"http://tempuri.org/SolutionDataset.xsd": None}
         force_list_data = [value.name for value in SolutionSchema]
-        content: OrderedDict[str, Any] = xmltodict.parse(xml_input=xml_file, force_list=force_list_data)
+        content: OrderedDict[str, Any] = xmltodict.parse(
+            xml_input=xml_file,
+            force_list=force_list_data,
+            process_namespaces=True,
+            namespaces=namespace
+        )
         return cls(**content['SolutionDataset'])
