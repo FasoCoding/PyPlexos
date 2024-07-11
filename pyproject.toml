@@ -19,6 +19,7 @@ streamlit = "^1.31.0"
 duckdb-engine = "^0.11.1"
 sqlalchemy-access = "^2.0.2"
 pendulum = "^3.0.0"
+xmltodict = "^0.13.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.1.9"
