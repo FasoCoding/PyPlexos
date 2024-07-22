@@ -850,6 +850,21 @@ def test_master_dataset_table():
                 '    <tag>10000</tag>\n'
                 '    <is_visible>true</is_visible>\n'
             '  </t_attribute>\n'
+            '  <t_attribute>\n'
+                '    <attribute_id>445</attribute_id>\n'
+                '    <class_id>93</class_id>\n'
+                '    <enum_id>4</enum_id>\n'
+                '    <name>Transient</name>\n'
+                '    <unit_id>13</unit_id>\n'
+                '    <default_value>0</default_value>\n'
+                '    <validation_rule>In (0,-1)</validation_rule>\n'
+                '    <input_mask>-1;"Yes";0;"No"</input_mask>\n'
+                '    <is_enabled>true</is_enabled>\n'
+                '    <is_integer>true</is_integer>\n'
+                '    <lang_id>1357</lang_id>\n'
+                '    <description>Transient lists are not saved in the XML but only exist in the current session.</description>\n'
+                '    <is_visible>true</is_visible>\n'
+            '  </t_attribute>\n'
             '  <t_attribute_data>\n'
                 '    <object_id>2</object_id>\n'
                 '    <attribute_id>1</attribute_id>\n'
@@ -1034,13 +1049,25 @@ def test_master_dataset_table():
             name="Latitude",
             unit_id=11,
             default_value=0,
-            validation_rule=None,
-            input_mask=None,
             is_enabled=True,
             is_integer=False,
             lang_id=343,
             description="Latitude",
             tag=10000,
+            is_visible=True,),
+            xml_model.AttributeTable(
+            attribute_id=445,
+            class_id=93,
+            enum_id=4,
+            name="Transient",
+            unit_id=13,
+            default_value=0,
+            validation_rule='In (0,-1)',
+            input_mask='-1;"Yes";0;"No"',
+            is_enabled=True,
+            is_integer=True,
+            lang_id=1357,
+            description="Transient lists are not saved in the XML but only exist in the current session.",
             is_visible=True,)],
         t_attribute_data=[xml_model.AttributeDataTable(
             object_id=2,
@@ -1207,7 +1234,7 @@ def test_master_dataset_table():
     )
     # Prueba de escritura de xml
     assert xmltodict.unparse(
-        {'MasterDataSet': table.model_dump(by_alias=True, exclude_none=True) | namespace_out},
+        {'MasterDataSet': table.model_dump(by_alias=True, exclude_unset=True) | namespace_out},
         full_document=False,
         pretty=True,
         indent="  "
