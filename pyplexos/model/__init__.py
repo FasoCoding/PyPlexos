@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from typing import Self
 from pathlib import Path
 
@@ -34,6 +34,10 @@ class PlexosModel:
     t_message: pa.Table
     t_property_tag: pa.Table
 
+    def items(self):
+        for field in fields(self):
+            yield field.name, getattr(self, field.name)
+
     @classmethod
     def from_xml(cls, xml_file_path: str) -> Self:
         path = Path(xml_file_path)
@@ -42,8 +46,20 @@ class PlexosModel:
             raise FileNotFoundError(f"Path does not exists: {xml_file_path}")
 
         with open(path, "rb") as xml_file:
-            plexos_model = MasterDataSet.from_xml(xml_file).model_dump(by_alias=True, exclude_none=True)
-        
-        #transformed_model = map(pa.Table.from_pylist, plexos_model)
-        #transformed_2 = {table_name: pa.Table.from_pylist(table_data) for table_name, table_data in plexos_model}
+            plexos_model = MasterDataSet.from_xml(xml_file).model_dump(by_alias=True)
+
         return cls(**{table_name: pa.Table.from_pylist(table_data) for table_name, table_data in plexos_model.items()})
+
+    def to_xml(self, xml_file_path: str | None) -> str:
+        """Transform Plexos Model to xml format, if file_path is define then it will write the xml file.
+
+        Args:
+            xml_file_path (str | None): path to write (no filename), it has an standart name "DBSEN_PRGDIARIO.xml".
+
+        Returns:
+            str: xml representation of the Plexos Model
+        """
+        plexos_model = MasterDataSet(**{table_name: table_data.to_pylist() for table_name, table_data in self.items()})
+        xml = plexos_model.to_xml(xml_path=xml_file_path)
+
+        return xml
