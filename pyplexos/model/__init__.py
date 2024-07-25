@@ -1,10 +1,11 @@
 from dataclasses import dataclass, fields
-from typing import Self
+from typing import Self, Any
 from pathlib import Path
 
 from pyplexos.model.xml import MasterDataSet
 
 import pyarrow as pa
+import pyarrow.parquet as pq
 
 @dataclass
 class PlexosModel:
@@ -63,3 +64,13 @@ class PlexosModel:
         xml = plexos_model.to_xml(xml_path=xml_file_path)
 
         return xml
+
+    def to_parquet(self, path_to_folder: str, **kwargs: Any) -> None:
+        path = Path(path_to_folder)
+
+        if not path.exists():
+            raise FileNotFoundError(f"Path does not exists: {path_to_folder}")
+
+        for table_name, table_data in self.items():
+            path_to_write: Path = path / table_name
+            pq.write_table(table_data, path_to_write.with_suffix(".parquet"), **kwargs)
