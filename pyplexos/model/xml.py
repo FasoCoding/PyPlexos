@@ -76,8 +76,8 @@ class CollectionReportTable(BaseModel):
     rule_id: Optional[int] = None
 
 class ConfigTable(BaseModel):
-    element_: str = Field(alias="element")
-    value_: str = Field(alias="value")
+    config_element: str = Field(alias="element")
+    config_value: str = Field(alias="value")
 
 class DataTable(BaseModel):
     data_id: int
