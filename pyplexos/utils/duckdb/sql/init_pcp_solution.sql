@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS pcp_solution.t_object (
     category_id INTEGER,
     index INTEGER,
     object_id INTEGER,
-    show INTEGER,
+    "show" BOOLEAN,
     GUID VARCHAR,
     prg_date TIMESTAMP,
 );
@@ -278,9 +278,9 @@ CREATE TABLE IF NOT EXISTS pcp_solution.t_property (
     summary_name VARCHAR,
     unit_id INTEGER,
     summary_unit_id INTEGER,
-    is_multi_band INTEGER,
-    is_period INTEGER,
-    is_summary INTEGER,
+    is_multi_band BOOLEAN,
+    is_period BOOLEAN,
+    is_summary BOOLEAN,
     lang_id INTEGER,
     prg_date TIMESTAMP,
 );
