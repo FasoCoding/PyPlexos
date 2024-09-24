@@ -58,6 +58,7 @@ class GeneratorProperty(Enum):
     MAX_CAPACITY = 1, 200, "Max Capacity"
     UNITS_OUT = 1, 209, "Units Out"
     AVAILABLE_CAPACITY = 1, 219, "Available Capacity"
+    PROVISION = 118, 601, "Provision"
 
 class FuelProperty(Enum):
     OFFTAKE = 33, 344, "Offtake"
