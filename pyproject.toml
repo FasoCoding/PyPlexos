@@ -12,7 +12,7 @@ dependencies = [
     "pyarrow",
     "pendulum",
     "sqlalchemy-access",
-    "tqdm",
+    "pyarrow-stubs>=17.12",
 ]
 
 [tool.uv]

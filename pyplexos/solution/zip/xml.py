@@ -1,10 +1,11 @@
 import datetime as dt
 import xmltodict
 
-#from io import BytesIO, StringIO
+# from io import BytesIO, StringIO
 from pydantic import BaseModel, field_validator, Field
 from typing import Optional, OrderedDict, Any, IO
 from pyplexos.solution.schema import SolutionSchema
+
 
 class UnitTable(BaseModel):
     """
@@ -66,7 +67,7 @@ class CollectionTable(BaseModel):
     parent_class_id: int
     child_class_id: int
     name: str
-    complement_name: Optional[str]
+    complement_name: str | None
     lang_id: int
 
 
@@ -76,7 +77,7 @@ class ConfigTable(BaseModel):
     """
 
     element: str
-    value: Optional[str]
+    value: str | None
 
 
 class KeyTable(BaseModel):
@@ -130,7 +131,7 @@ class ObjectTable(BaseModel):
     index: int
     object_id: int
     show: bool
-    guid: Optional[str] = Field(alias="GUID", default=None)
+    guid: str | None = Field(alias="GUID", default=None)
 
 
 class Period0Table(BaseModel):
@@ -211,7 +212,9 @@ class PropertyTable(BaseModel):
     lang_id: int
 
 
-class AttributeDataTable(BaseModel,):
+class AttributeDataTable(
+    BaseModel,
+):
     """
     Class to represent the table: t_attribute_data
     """
@@ -440,6 +443,6 @@ class SolutionModel(BaseModel):
             xml_input=xml_file,
             force_list=force_list_data,
             process_namespaces=True,
-            namespaces=namespace
+            namespaces=namespace,
         )
-        return cls(**content['SolutionDataset'])
+        return cls(**content["SolutionDataset"])
