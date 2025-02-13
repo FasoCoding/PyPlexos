@@ -244,7 +244,7 @@ class SampleWeightTable(BaseModel):
 
     sample_id: int
     phase_id: int
-    value: int
+    value: float  # antes era int?
 
 
 class CustomCoumnTable(BaseModel):
