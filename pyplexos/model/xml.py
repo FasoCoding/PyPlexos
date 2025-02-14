@@ -1,7 +1,7 @@
 import datetime as dt
 import xmltodict
 
-#from io import BytesIO, StringIO
+# from io import BytesIO, StringIO
 from pydantic import BaseModel, Field, field_serializer
 from typing import Optional, OrderedDict, Any, IO
 from pathlib import Path
@@ -23,14 +23,17 @@ class AttributeTable(BaseModel):
     tag: Optional[int] = None
     is_visible: bool
 
+
 class AttributeDataTable(BaseModel):
     object_id: int
     attribute_id: int
     value: float
 
+
 class BandTable(BaseModel):
     data_id: int
     band_id: int
+
 
 class CategoryTable(BaseModel):
     category_id: int
@@ -38,18 +41,21 @@ class CategoryTable(BaseModel):
     rank: int
     name: str
 
+
 class ClassTable(BaseModel):
     class_id: int
     name: str
     class_group_id: int
-    is_enabled: bool
+    is_enabled: bool | None = None
     lang_id: int
-    description: str
+    description: str | None = None
+
 
 class ClassGroupTable(BaseModel):
     class_group_id: int
     name: str
     lang_id: int
+
 
 class CollectionTable(BaseModel):
     collection_id: int
@@ -67,6 +73,7 @@ class CollectionTable(BaseModel):
     complement_max_count: Optional[int] = None
     complement_description: Optional[str] = None
 
+
 class CollectionReportTable(BaseModel):
     collection_id: int
     left_collection_id: int
@@ -75,9 +82,11 @@ class CollectionReportTable(BaseModel):
     rule_right_collection_id: Optional[int] = None
     rule_id: Optional[int] = None
 
+
 class ConfigTable(BaseModel):
     config_element: str = Field(alias="element")
     config_value: str = Field(alias="value")
+
 
 class DataTable(BaseModel):
     data_id: int
@@ -85,6 +94,7 @@ class DataTable(BaseModel):
     property_id: int
     value: float | int
     uid: int
+
 
 class DateFromTable(BaseModel):
     data_id: int
@@ -94,6 +104,7 @@ class DateFromTable(BaseModel):
     def ser_date(self, date: dt.datetime):
         return date.strftime(r"%Y-%m-%dT%H:%M:%S")
 
+
 class DateToTable(BaseModel):
     data_id: int
     date: dt.datetime
@@ -101,6 +112,7 @@ class DateToTable(BaseModel):
     @field_serializer("date")
     def ser_date(self, date: dt.datetime):
         return date.strftime(r"%Y-%m-%dT%H:%M:%S")
+
 
 class MembershipTable(BaseModel):
     membership_id: int
@@ -110,6 +122,7 @@ class MembershipTable(BaseModel):
     child_class_id: int
     child_object_id: int
 
+
 class ObjectTable(BaseModel):
     object_id: int
     class_id: int
@@ -117,6 +130,7 @@ class ObjectTable(BaseModel):
     category_id: int
     description: Optional[str] = None
     guid: str = Field(alias="GUID")
+
 
 class PropertyTable(BaseModel):
     property_id: int
@@ -142,15 +156,18 @@ class PropertyTable(BaseModel):
     tag: Optional[str] = None
     is_visible: bool
 
+
 class PropertyGroupTable(BaseModel):
     property_group_id: int
     name: str
     lang_id: int
 
+
 class TagTable(BaseModel):
     data_id: int
     object_id: int
     action_id: Optional[int] = None
+
 
 class TextTable(BaseModel):
     data_id: int
@@ -159,7 +176,8 @@ class TextTable(BaseModel):
 
     @field_serializer("value")
     def ser_value(self, value: str):
-        return rf'{value}'
+        return rf"{value}"
+
 
 class UnitTable(BaseModel):
     unit_id: int
@@ -173,9 +191,11 @@ class UnitTable(BaseModel):
     imperial_volume: Optional[str] = None
     description: Optional[str] = None
 
+
 class MemoDataTable(BaseModel):
     data_id: int
     value: str
+
 
 class PropertyReportTable(BaseModel):
     property_id: int
@@ -199,6 +219,7 @@ class PropertyReportTable(BaseModel):
     description: str
     is_visible: bool
 
+
 class ReportTable(BaseModel):
     object_id: int
     property_id: int
@@ -209,9 +230,11 @@ class ReportTable(BaseModel):
     report_samples: bool
     write_flat_files: bool
 
+
 class ActionTable(BaseModel):
     action_id: int
     action_symbol: str
+
 
 class MessageTable(BaseModel):
     number: int
@@ -220,9 +243,11 @@ class MessageTable(BaseModel):
     action: int
     description: Optional[str] = None
 
+
 class PropertyTagTable(BaseModel):
     tag_id: int
     name: str
+
 
 class MasterDataSet(BaseModel):
     t_attribute: list[AttributeTable]
@@ -259,22 +284,29 @@ class MasterDataSet(BaseModel):
             xml_input=xml_file,
             force_list=force_list_data,
             process_namespaces=True,
-            namespaces=namespace
+            namespaces=namespace,
         )
-        return cls(**content['MasterDataSet'])
+        return cls(**content["MasterDataSet"])
 
     def to_xml(self, xml_path: Optional[str] = None):
         namespace = {"@xmlns": "http://tempuri.org/MasterDataSet.xsd"}
         xml_data = xmltodict.unparse(
-            {'MasterDataSet': self.model_dump(exclude_none=True, by_alias=True) | namespace},
+            {
+                "MasterDataSet": self.model_dump(
+                    exclude_none=True, by_alias=True
+                )
+                | namespace
+            },
             full_document=False,
             pretty=True,
-            indent="  "
+            indent="  ",
         )
 
         if xml_path:
             path = Path(xml_path)
-            with open( path / "DBSEN_PRGDIARIO.xml", "w", encoding="utf-8") as file:
+            with open(
+                path / "DBSEN_PRGDIARIO.xml", "w", encoding="utf-8"
+            ) as file:
                 file.write(xml_data)
-        
+
         return xml_data

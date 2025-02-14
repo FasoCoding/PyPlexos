@@ -45,7 +45,7 @@ class ClassTable(BaseModel):
     name: str
     class_group_id: int
     lang_id: int
-    state: int
+    state: int | None = None
 
 
 class ClassGroupTable(BaseModel):
